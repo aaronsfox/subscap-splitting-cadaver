@@ -18,10 +18,16 @@ Mimics was used to digitise the image. The following steps were taken:
 
 Below is a sample of the end result of the above digitisation process in Mimics.
 
-![](C:\subscap-splitting-cadaver\Piloting\testAnalysis\sampleDigitisation.bmp)
+![](sampleDigitisation.bmp)
 
 ## Export Process
 
 From Mimics the points across muscle lines, humeral head and glenoid plane are all exported, along with the phantom bead circle. This is all done in the one text file named 'digitisationExport.txt'. To do this, the items are selected and from the right click menu select 'Export txt...'. This is then a simple process of adding the items and exporting to the appropriate folder.
 
 The Mimics file can also be saved as a project file so it can be re-opened later for any changes.
+
+## Data Analysis
+
+...
+
+...base version of Anaconda distribution with Python 3.7...
