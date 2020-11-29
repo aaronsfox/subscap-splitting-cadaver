@@ -20,12 +20,13 @@ from matplotlib import pyplot as plt
 import csv
 import numpy as np
 import pandas as pd
+import math
 
 # %% Import image
 
 #Create image object from files
 img = Image.open('UDF_S19-009R_specimen1_D0910_T1435_condNP_0abd_40N_SP.tif')
-# imgDig = Image.open('sampleDigitisation.bmp')
+imgDig = Image.open('sampleDigitisation.bmp')
 
 #The image in this case needs to be rotated 180 degrees to match Mimics
 img = img.rotate(180)
@@ -53,12 +54,6 @@ itemDict = {'pointName': [], 'pointType': [], 'X': [], 'Y': [], 'radius': []}
 
 ##### NOTE: in this case XZ represents the XY points and hence the item list
 ##### indices reflect this
-
-#The Y-axis coordinates are inverted due to the way image coordinates are imported
-#To fix this so that the XY axes originates in the lower left corner we invert
-#them relative to the length of the axis (i.e. image height). We do this in getting
-#the y-values below
-    ##### NOT DOING THIS ANYMORE...
         
 #Search through the item list for the various items
 for ii in range(len(itemList)):
@@ -119,7 +114,7 @@ for ii in range(len(itemList)):
             #Set radius as NaN
             itemDict['radius'].append(np.nan)
         #Humeral head
-        if currItem[0].startswith('hh'):
+        if currItem[0].startswith('hh') and len(currItem) == 5:
             #Set point type
             itemDict['pointType'].append('hh')
             #Extract point name
@@ -148,6 +143,18 @@ for ii in range(len(itemList)):
             itemDict['pointType'].append('phantom')
             #Extract point name
             itemDict['pointName'].append(currItem[0].strip())
+            #Extract X coordinate
+            itemDict['X'].append(float(currItem[1].strip()))
+            #Extract Y coordinate
+            itemDict['Y'].append(float(currItem[3].strip()))
+            #Set radius
+            itemDict['radius'].append(float(currItem[4].strip()))
+        #Humeral head circle (3pt method)
+        if currItem[0].startswith('hh3pt'):
+            #Set point type
+            itemDict['pointType'].append('hhCircle')
+            #Extract point name
+            itemDict['pointName'].append('hhCircle')
             #Extract X coordinate
             itemDict['X'].append(float(currItem[1].strip()))
             #Extract Y coordinate
@@ -222,25 +229,111 @@ plt.imshow(np.flipud(img), cmap = 'gray', origin = 'lower')
     ##### I think it's OK and it's just a weird visual hitch...when you zoom in
     ##### they look accurate
 
-#Plot subscapularis points
+#Plot subscapularis points and lines
+#Set point labels
 ssLabels = ['ss1','ss2','ss3','ss4']
+#Identify point to extend lines of action to
+#Currently half-way between image edge and humeral head centre
+extendX = df_items.loc[df_items['pointType'] == 'hhCircle',['X']].values[0][0] / 2
 for pp in range(len(ssLabels)):
+    #Get points
     pts = df_items.loc[df_items['pointType'] == ssLabels[pp],['X','Y']].to_numpy()
+    #Plot points
     plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'red')
+    #Fit and plot line
+    m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+    plt.plot(pts[:,0], m * pts[:,0] + c, c = 'red', lw = 1)
+    #Extend line of action
+    plt.plot(np.array((extendX,np.min(pts[:,0]))),
+             m * np.array((extendX,np.min(pts[:,0]))) + c,
+             c = 'red', lw = 1, ls = '--')
 
 #Plot humeral head points
 pts = df_items.loc[df_items['pointType'] == 'hh',['X','Y']].to_numpy()
 plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'green')
 
-#Plot glenoid plane points
+#Plot glenoid plane points and fit line
 pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
 plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'yellow')
+m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+plt.plot(pts[:,0], m * pts[:,0] + c, c = 'yellow', lw = 1)
 
 #Plot bead circle
 pts = df_items.loc[df_items['pointType'] == 'phantom',['X','Y','radius']].to_numpy()
 ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
                          edgecolor = 'blue', facecolor = 'none'))
 
-#Plot humeral head circle and centre
+#Plot multi-point calculated humeral head circle and centre
 plt.scatter(xc, yc, s = 500, c = 'green', marker = '+')
 ax.add_artist(plt.Circle((xc, yc), R, edgecolor = 'green', facecolor = 'none'))
+
+#Plot three-point humeral head circle and centre
+pts = df_items.loc[df_items['pointType'] == 'hhCircle',['X','Y','radius']].to_numpy()
+plt.scatter(pts[0][0], pts[0][1], s = 500, c = 'yellow', marker = '+')
+ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
+                         edgecolor = 'yellow', facecolor = 'none'))
+
+##### NOTE: 3pt fits pretty similarly to this example - probably easier option
+
+# %% Moment arm calculations
+
+##### TODO: clean up function...
+
+#Visualise moment arm line of one of the subscapularis lines
+fig, ax = plt.subplots()
+plt.imshow(np.flipud(img), cmap = 'gray', origin = 'lower')
+#Humeral head
+pts = df_items.loc[df_items['pointType'] == 'hhCircle',['X','Y','radius']].to_numpy()
+plt.scatter(pts[0][0], pts[0][1], s = 500, c = 'yellow', marker = '+')
+ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
+                         edgecolor = 'yellow', facecolor = 'none'))
+#Subscapularis line
+pp = 3
+pts = df_items.loc[df_items['pointType'] == ssLabels[pp],['X','Y']].to_numpy()
+plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'red')
+m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+plt.plot(pts[:,0], m * pts[:,0] + c, c = 'red', lw = 1)
+plt.plot(np.array((extendX,np.min(pts[:,0]))),
+         m * np.array((extendX,np.min(pts[:,0]))) + c,
+         c = 'red', lw = 1, ls = '--')
+
+#Calculate the point on the extended subscapularis line that is intercepted
+#by a perpendicular line from the humerus
+
+#Set the points at the start and the end of the subscapularis line
+x1 = extendX
+y1 = m * extendX + c
+x2 = max(pts[:,0])
+y2 = m * x2 + c
+
+#Set the humeral head point
+x3 = df_items.loc[df_items['pointType'] == 'hhCircle',['X']].values[0][0]
+y3 = df_items.loc[df_items['pointType'] == 'hhCircle',['Y']].values[0][0]
+
+#Calculate intersecting point with perpendicular line
+#SEE: https://stackoverflow.com/questions/1811549/perpendicular-on-a-line-from-a-given-point
+k = ((y2-y1) * (x3-x1) - (x2-x1) * (y3-y1)) / ((y2-y1)**2 + (x2-x1)**2)
+x4 = x3 - k * (y2-y1)
+y4 = y3 + k * (x2-x1)
+
+#Plot the perpendicular line between the points
+#This is effectively the moment arm
+plt.plot(np.array((x3,x4)),np.array((y3,y4)),
+         c = 'green', lw = 1, ls = '--')
+
+#Calculate moment arm distance
+##### NOTE: this isn't currently scaled by the bead size, as I believe
+##### the units might already be accurate --- but could be incorporated.
+##### In addition, the direction of the moment arm (+ve ve. -ve) should
+##### also be considered.
+ma = math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))
+
+##### The units do look incorrect, as the radius of the bead is ~30, rather
+##### than the ~3 it should be. The moment arm calculation above divided by
+##### 10 also lines up with the Ackland et al. study
+
+# %% Calculate lines of action
+
+##### TODO: for lines of action we should simply rotate the 
+##### coordinates/lines so that the normal of the glenoid plane
+##### is horizontal, which will make the angle calculation easier...
