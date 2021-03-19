@@ -22,11 +22,16 @@ import numpy as np
 import pandas as pd
 import math
 
+from skimage import io
+
 # %% Import image
 
 #Create image object from files
-img = Image.open('UDF_S19-009R_specimen1_D0910_T1435_condNP_0abd_40N_SP.tif')
-imgDig = Image.open('sampleDigitisation.bmp')
+# I = plt.imread('UDF_S19-009R_specimen1_D0910_T1435_condNP_0abd_40N_SP.tif')
+img = io.imread('UDF_S19-009R_specimen1_D0910_T1435_condNP_0abd_40N_SP.tif')
+# img = Image.open('UDF_S19-009R_specimen1_D0910_T1435_condNP_0abd_40N_SP.tif')
+# imgArray = np.array(img)
+# imgDig = Image.open('sampleDigitisation.bmp')
 
 #The image in this case needs to be rotated 180 degrees to match Mimics
 img = img.rotate(180)
@@ -211,6 +216,9 @@ Ri = np.sqrt((x-xc)**2 + (y-yc)**2)
 R = np.mean(Ri)
 residuals = sum((Ri-R)**2)
 
+#### NOTE: I prefer the circular fitting in Mimics manually, rather than by points
+#### provides an opportunity to fit it yourself with experimentation
+
 # %% Visualise
 
 #Visualise points on image
@@ -220,6 +228,10 @@ fig, ax = plt.subplots()
 plt.imshow(np.flipud(img), cmap = 'gray', origin = 'lower')
 # plt.imshow(imgDig, cmap = 'gray')
 # plt.imshow(np.flipud(imgDig), cmap = 'gray', origin = 'lower')
+
+# #Set axes if not loading image
+# ax.set_xlim([0,img.size[0]])
+# ax.set_ylim([0,img.size[1]])
 
 ##### seems necessary to invert the points but not the image
 ##### it seems the points come across as you would think from an XY perspective
@@ -248,9 +260,16 @@ for pp in range(len(ssLabels)):
              m * np.array((extendX,np.min(pts[:,0]))) + c,
              c = 'red', lw = 1, ls = '--')
 
-#Plot humeral head points
-pts = df_items.loc[df_items['pointType'] == 'hh',['X','Y']].to_numpy()
-plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'green')
+# #Plot humeral head points
+# pts = df_items.loc[df_items['pointType'] == 'hh',['X','Y']].to_numpy()
+# plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'green')
+    
+#Plot humeral head circle
+pts = df_items.loc[df_items['pointType'] == 'hhCircle',['X','Y','radius']].to_numpy()
+ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
+                         edgecolor = 'green', facecolor = 'none'))
+#Include the humeral head centre
+plt.scatter(pts[0][0], pts[0][1], s = 500, c = 'green', marker = '+')
 
 #Plot glenoid plane points and fit line
 pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
@@ -258,24 +277,25 @@ plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'yellow')
 m,c = np.polyfit(pts[:,0], pts[:,1], 1)
 plt.plot(pts[:,0], m * pts[:,0] + c, c = 'yellow', lw = 1)
 
-#Plot bead circle
-pts = df_items.loc[df_items['pointType'] == 'phantom',['X','Y','radius']].to_numpy()
-ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
-                         edgecolor = 'blue', facecolor = 'none'))
+# #Plot bead circle
+# pts = df_items.loc[df_items['pointType'] == 'phantom',['X','Y','radius']].to_numpy()
+# ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
+#                          edgecolor = 'blue', facecolor = 'none'))
 
-#Plot multi-point calculated humeral head circle and centre
-plt.scatter(xc, yc, s = 500, c = 'green', marker = '+')
-ax.add_artist(plt.Circle((xc, yc), R, edgecolor = 'green', facecolor = 'none'))
-
-#Plot three-point humeral head circle and centre
-pts = df_items.loc[df_items['pointType'] == 'hhCircle',['X','Y','radius']].to_numpy()
-plt.scatter(pts[0][0], pts[0][1], s = 500, c = 'yellow', marker = '+')
-ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
-                         edgecolor = 'yellow', facecolor = 'none'))
+# #Plot multi-point calculated humeral head circle and centre
+# plt.scatter(xc, yc, s = 500, c = 'green', marker = '+')
+# ax.add_artist(plt.Circle((xc, yc), R, edgecolor = 'green', facecolor = 'none'))
 
 ##### NOTE: 3pt fits pretty similarly to this example - probably easier option
 
+# #Equal axes
+# plt.gca().set_aspect('equal', adjustable = 'box')
+
 # %% Moment arm calculations
+
+#Calculate the scaling factor to make the bead radius = 3
+beadImgRadius = df_items.loc[df_items['pointType'] == 'phantom',['radius']].to_numpy()[0][0]
+beadScale = beadImgRadius / 3
 
 ##### TODO: clean up function...
 
@@ -284,9 +304,9 @@ fig, ax = plt.subplots()
 plt.imshow(np.flipud(img), cmap = 'gray', origin = 'lower')
 #Humeral head
 pts = df_items.loc[df_items['pointType'] == 'hhCircle',['X','Y','radius']].to_numpy()
-plt.scatter(pts[0][0], pts[0][1], s = 500, c = 'yellow', marker = '+')
+plt.scatter(pts[0][0], pts[0][1], s = 500, c = 'green', marker = '+')
 ax.add_artist(plt.Circle((pts[0][0], pts[0][1]), pts[0][2],
-                         edgecolor = 'yellow', facecolor = 'none'))
+                         edgecolor = 'green', facecolor = 'none'))
 #Subscapularis line
 pp = 3
 pts = df_items.loc[df_items['pointType'] == ssLabels[pp],['X','Y']].to_numpy()
@@ -319,14 +339,14 @@ y4 = y3 + k * (x2-x1)
 #Plot the perpendicular line between the points
 #This is effectively the moment arm
 plt.plot(np.array((x3,x4)),np.array((y3,y4)),
-         c = 'green', lw = 1, ls = '--')
+         c = 'yellow', lw = 1, ls = '--')
 
 #Calculate moment arm distance
 ##### NOTE: this isn't currently scaled by the bead size, as I believe
 ##### the units might already be accurate --- but could be incorporated.
 ##### In addition, the direction of the moment arm (+ve ve. -ve) should
 ##### also be considered.
-ma = math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))
+ma = (math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))) / beadScale
 
 ##### The units do look incorrect, as the radius of the bead is ~30, rather
 ##### than the ~3 it should be. The moment arm calculation above divided by
