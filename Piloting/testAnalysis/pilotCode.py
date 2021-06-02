@@ -381,6 +381,9 @@ for ss in range(len(ssLabels)):
 
 # %% Calculate lines of action
 
+##### I DON'T THINK THIS IS RIGHT, NEED TO ROTATE ABOUT HUMERUS, OR NOT AT ALL?
+
+
 ##### TODO: for lines of action we should simply rotate the 
 ##### coordinates/lines so that the normal of the glenoid plane
 ##### is horizontal, which will make the angle calculation easier...
@@ -388,58 +391,128 @@ for ss in range(len(ssLabels)):
 ##### The below code has some assumptions around the position of the arm/glenoid
 ##### plane in this context --- so would need to be conistent
 
-#Line intersection code
-def lineIntersect(Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2):
-    """ returns a (x, y) tuple or None if there is no intersection """
-    d = (By2 - By1) * (Ax2 - Ax1) - (Bx2 - Bx1) * (Ay2 - Ay1)
-    uA = ((Bx2 - Bx1) * (Ay1 - By1) - (By2 - By1) * (Ax1 - Bx1)) / d
-    uB = ((Ax2 - Ax1) * (Ay1 - By1) - (Ay2 - Ay1) * (Ax1 - Bx1)) / d
-    x = Ax1 + uA * (Ax2 - Ax1)
-    y = Ay1 + uA * (Ay2 - Ay1)
+# #Line intersection code
+# def lineIntersect(Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2):
+#     """ returns a (x, y) tuple or None if there is no intersection """
+#     d = (By2 - By1) * (Ax2 - Ax1) - (Bx2 - Bx1) * (Ay2 - Ay1)
+#     uA = ((Bx2 - Bx1) * (Ay1 - By1) - (By2 - By1) * (Ax1 - Bx1)) / d
+#     uB = ((Ax2 - Ax1) * (Ay1 - By1) - (Ay2 - Ay1) * (Ax1 - Bx1)) / d
+#     x = Ax1 + uA * (Ax2 - Ax1)
+#     y = Ay1 + uA * (Ay2 - Ay1)
  
-    return x, y
+#     return x, y
     
-#Calculate intersect of glenoid plane and lowest subscapularis
-#Set glenoid points as the top and bottom points
-#Extract two points on a line fit to the glenoid plane
-#Plot glenoid plane points and fit line
-pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
-m,c = np.polyfit(pts[:,0], pts[:,1], 1)
-gx1 = 0
-gx2 = 100
-gy1 = m*gx1 + c #y-intercept; x = 0
-gy2 = m*gx2 + c #x = 100
+# #Show image
+# fig, ax = plt.subplots(figsize = (6,6))
+# ax.imshow(np.flipud(img), cmap = 'gray', origin = 'lower')
 
-#Extract two points on the subscapularis linefit
-pts = df_items.loc[df_items['pointType'] == 'ss4',['X','Y']].to_numpy()
-m,c = np.polyfit(pts[:,0], pts[:,1], 1)
-sx1 = 0
-sx2 = 100
-sy1 = m*sx1 + c #y-intercept; x = 0
-sy2 = m*sx2 + c #x = 100
+# #Display subscapularis line (last one)
+# pts = df_items.loc[df_items['pointType'] == ssLabels[-1],['X','Y']].to_numpy()
+# ax.scatter(pts[:,0], pts[:,1], s = 10, c = 'red')
+# m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+# ax.plot(pts[:,0], m * pts[:,0] + c, c = 'red', lw = 1)
+# ax.plot(np.array((extendX,np.min(pts[:,0]))),
+#         m * np.array((extendX,np.min(pts[:,0]))) + c,
+#         c = 'red', lw = 1, ls = '--')
 
-#Calculate line intersection
-# Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2 = gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2
-intX, intY = lineIntersect(gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2)
-plt.scatter(intX, intY, c = 'cyan')
+# #Display glenoid plane and extension
+# pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
+# plt.scatter(pts[:,0], pts[:,1], s = 10, c = 'yellow')
+# m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+# plt.plot(pts[:,0], m * pts[:,0] + c, c = 'yellow', lw = 1)
+# ax.plot(np.array((750,np.min(pts[:,0]))),
+#         m * np.array((750,np.min(pts[:,0]))) + c, ### arbitrary point of 750 to extend to on x-axes
+#         c = 'yellow', lw = 1, ls = '--')
 
-#determine slope (i.e. negative reciprocal) of perpendicular line to glenoid plane
-pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
-m,c = np.polyfit(pts[:,0], pts[:,1], 1)
-mPerp = 1 / (-m)
-#Solve for y-intercept of new line
-#Use intercept points for line
-cPerp = (mPerp*intX - intY) * -1
-#Visualise
-plt.plot([0,intX], [cPerp, intY], c = 'cyan', lw = 1, ls = '--')
+# #Calculate intersect of glenoid plane and lowest subscapularis
+# #Set glenoid points as the top and bottom points
+# #Extract two points on a line fit to the glenoid plane
+# #Plot glenoid plane points and fit line
+# pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
+# m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+# gx1 = 0
+# gx2 = 100
+# gy1 = m*gx1 + c #y-intercept; x = 0
+# gy2 = m*gx2 + c #x = 100
+
+# #Extract two points on the subscapularis linefit
+# pts = df_items.loc[df_items['pointType'] == 'ss4',['X','Y']].to_numpy()
+# m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+# sx1 = 0
+# sx2 = 100
+# sy1 = m*sx1 + c #y-intercept; x = 0
+# sy2 = m*sx2 + c #x = 100
+
+# #Calculate line intersection
+# # Ax1, Ay1, Ax2, Ay2, Bx1, By1, Bx2, By2 = gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2
+# intX, intY = lineIntersect(gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2)
+# plt.scatter(intX, intY, c = 'cyan')
+
+# #determine slope (i.e. negative reciprocal) of perpendicular line to glenoid plane
+# pts = df_items.loc[df_items['pointType'] == 'gp',['X','Y']].to_numpy()
+# m,c = np.polyfit(pts[:,0], pts[:,1], 1)
+# mPerp = 1 / (-m)
+# #Solve for y-intercept of new line
+# #Use intercept points for line
+# cPerp = (mPerp*intX - intY) * -1
+# #Visualise
+# plt.plot([0,intX], [cPerp, intY], c = 'cyan', lw = 1, ls = '--')
 
 
-#Set the points at the start and the end of the subscapularis line
-    x1 = extendX
-    y1 = m * extendX + c
-    x2 = max(pts[:,0])
-    y2 = m * x2 + c
-    
-    #Set the humeral head point
-    x3 = df_items.loc[df_items['pointType'] == 'hhCircle',['X']].values[0][0]
-    y3 = df_items.loc[df_items['pointType'] == 'hhCircle',['Y']].values[0][0]
+# #Set the points at the start and the end of the subscapularis line
+# x1 = extendX
+# y1 = m * extendX + c
+# x2 = max(pts[:,0])
+# y2 = m * x2 + c
+
+# #Set the humeral head point
+# x3 = df_items.loc[df_items['pointType'] == 'hhCircle',['X']].values[0][0]
+# y3 = df_items.loc[df_items['pointType'] == 'hhCircle',['Y']].values[0][0]
+
+# %% For line of action - simply measure angle with respect to XY
+
+# This assumes the image is in the scapular plane, and the XY coordinates are
+# the lateral and superior axis
+
+#Show image
+fig, ax = plt.subplots(figsize = (6,6))
+ax.imshow(np.flipud(img), cmap = 'gray', origin = 'lower')
+
+#Get the first and the last point of the lower subscapularis
+pt1 = df_items.loc[df_items['pointName'] == 'ss4_1',['X','Y']].to_numpy().flatten()
+pt2 = df_items.loc[df_items['pointName'] == 'ss4_3',['X','Y']].to_numpy().flatten()
+
+#Plot subscap line
+ax.plot([pt1[0],pt2[0]], [pt1[1],pt2[1]],
+        color = 'r', marker = 'o', linewidth = 1)
+
+#Plot the axes from the first subscap point
+#Lateral axis
+ax.plot([pt1[0],pt1[0]-200], [pt1[1],pt1[1]],
+        color = 'y', marker = None, linewidth = 2)
+#Superior axis
+ax.plot([pt1[0],pt1[0]], [pt1[1],pt1[1]+200],
+        color = 'y', marker = None, linewidth = 2)
+
+#Create a triangle to measure the angle from
+ax.plot([pt1[0],pt1[0]], [pt1[1],pt2[1]],
+        color = 'g', marker = None, linewidth = 2)
+ax.plot([pt1[0],pt2[0]], [pt2[1],pt2[1]],
+        color = 'g', marker = None, linewidth = 2)
+
+#To calculate the top corner angle we can use the lengths of subscap line and 
+#the downward projection of the vertical axis to the level of the last point
+
+#Calculate line lengths
+#Subscap line
+subscapDist = math.sqrt((pt2[0] - pt1[0])**2 + (pt2[1] - pt1[1])**2)
+#Downward vertical projection
+vertDist =  math.sqrt((pt1[0] - pt1[0])**2 + (pt1[1] - pt2[1])**2)
+
+#Calculate angle. This is the top corner angle and needs 90 degrees added to it
+#to measure from the lateral axis
+ang = 90 + math.degrees(math.cos(vertDist/subscapDist))
+print(f'Angle from lateral axis: {ang} degrees')
+
+#### The above calculations place the angle pretty similar to 0 degrees for the 
+#### subscapularis in David's paper
