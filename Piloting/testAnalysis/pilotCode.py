@@ -381,9 +381,6 @@ for ss in range(len(ssLabels)):
 
 # %% Calculate lines of action
 
-##### I DON'T THINK THIS IS RIGHT, NEED TO ROTATE ABOUT HUMERUS, OR NOT AT ALL?
-
-
 ##### TODO: for lines of action we should simply rotate the 
 ##### coordinates/lines so that the normal of the glenoid plane
 ##### is horizontal, which will make the angle calculation easier...
@@ -470,6 +467,8 @@ for ss in range(len(ssLabels)):
 # y3 = df_items.loc[df_items['pointType'] == 'hhCircle',['Y']].values[0][0]
 
 # %% For line of action - simply measure angle with respect to XY
+
+### NOTE: this is wrong...
 
 # This assumes the image is in the scapular plane, and the XY coordinates are
 # the lateral and superior axis
