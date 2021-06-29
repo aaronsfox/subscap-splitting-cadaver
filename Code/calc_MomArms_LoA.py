@@ -231,6 +231,8 @@ for currDir in dirList:
         analyseDir = False
     else:
         analyseDir = True
+		
+	##### TODO: check for all necessary files - flag error or print notification???
         
     #Run calculations if data is available
     if analyseDir:
@@ -335,6 +337,8 @@ for currDir in dirList:
         #Moment arm calculations and visualisation
         
         ##### TODO: shift up to function --- consider how this works with left arm???
+        ##### Will need to consider image orientation to ensure moment arm direction
+        ##### remains appropriate for + vs. -
         
         #Set variable to store moment arm calculations in
         maList = []
@@ -355,6 +359,9 @@ for currDir in dirList:
             extendX = hhCentreX / 2
         else:
             extendX = hhCentreX + ((img.shape[1] - hhCentreX) / 2)
+            
+        #Set humeral head point as p3 for moment arm calculations
+        p3 = np.asarray((hhCentreX, hhCentreY))
         
         #Loop through four for subscap lines
         for subscap in subscapNames:
@@ -399,6 +406,13 @@ for currDir in dirList:
                 ax[whichAx[ss][0],whichAx[ss][1]].plot(np.array((np.max(subscapPoints[subscap]['X']),extendX)),
                                                        m * np.array((np.max(subscapPoints[subscap]['X']),extendX)) + c,
                                                        c = 'red', lw = 1, ls = '--')
+                
+            #Extract two points on the line for later moment arm calculation
+            #Take the end points of the line on the x-axes
+            p1 = np.asarray((ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[0],
+                             m * ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[0] + c))
+            p2 = np.asarray((ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[1],
+                             m * ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[1] + c))
             
             #Calculate the point on the extended subscapularis line that is intercepted
             #by a perpendicular line from the humerus
@@ -420,20 +434,26 @@ for currDir in dirList:
             y4 = y3 + k * (x2-x1)
             
             #Plot the perpendicular line between the points
-            #This is effectively the moment arm
+            #This is effectively the moment arm - but only use here as visualisation
             ax[whichAx[ss][0],whichAx[ss][1]].plot(
                 np.array((x3,x4)),np.array((y3,y4)),
                 c = 'yellow', lw = 1, ls = '--')
             
             #Calculate moment arm distance
             #Includes scale by bead size
-            ma = (math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))) / phantomScale
             
-            #Check if moment arm is positive (abduction/IR) vs. negative (adduction/ER)
-            #This considers proper orientation of image
-            if y3 < y4:
-                #Humeral head centre is above moment arm intersection
-                ma = ma*-1
+            #Old method using distance - prone to small errors
+            # ma = (math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))) / phantomScale
+            
+            #Use cross product to calculate moment arm
+            ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale
+            
+            # #Check if moment arm is positive (abduction/IR) vs. negative (adduction/ER)
+            # #This considers proper orientation of image
+            ### Not needed with cross product approach
+            # if y3 < y4:
+            #     #Humeral head centre is above moment arm intersection
+            #     ma = ma*-1
                 
             #Store moment arm value
             maList.append(ma)
@@ -458,14 +478,15 @@ for currDir in dirList:
                          'momentArmData.csv',
                          index = False)
                              
-        # %% Calculate lines of action
+        # %% Calculate lines of action & stability ratios
                              
         #Line of action calculations and visualisation
                          
         ##### TODO: shift to function --- consider right vs. left arm???
             
-        #Set variable to store line of action calculations in
+        #Set variable to store line of action and stability ratio calculations in
         loaList = []
+        srList = []
         
         #Create figure to visualise LoA's on
         fig = plt.figure(figsize = (4,8))
@@ -676,6 +697,42 @@ for currDir in dirList:
             
             #Store current LoA calculation in list
             loaList.append(lineOfAction)
+            
+            #Calculate stability ratio
+            
+            #Set a point at the end of the line of action
+            #If this is in the scapular plane, we'll use the max x-limit
+            if 'SP' in currPlaneName:
+                
+                #Get the point at the edge
+                srCalcPt = np.array([maxLim, rotM * maxLim + rotC])
+                
+            #If it is in the transverse plane, we'll use the min x-limit
+            if 'TP' in currPlaneName:
+                
+                #Get the point at the edge
+                srCalcPt = np.array([maxLim*-1, rotM * (maxLim*-1) + rotC])
+                
+            #Calculate the directional cosines for the axes
+            #This notes that the vector starts at the axes origin
+            
+            #Calculate the length of the vector between the origin and end point
+            vecLen = np.sqrt(srCalcPt[0]**2 + srCalcPt[1]**2)
+            
+            #Calculate the directional cosines for the X and Y axes
+            cosX = srCalcPt[0] / vecLen
+            cosY = srCalcPt[1] / vecLen
+            
+            #Calculate stability ratio
+            stabRatio = cosY / np.abs(cosX)
+                
+            #Store current stability ratio calculation in list
+            srList.append(stabRatio)
+            
+            #Print stability ratio in bootom right corner of axes
+            lnAx.text(1-0.025, 0.1,
+                      'SR = '+str(np.round(stabRatio,3)),
+                      ha = 'right', va = 'center', transform = lnAx.transAxes)
             
         #Tight layout
         plt.tight_layout()
