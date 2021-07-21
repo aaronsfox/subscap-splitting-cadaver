@@ -1,0 +1,54 @@
+*GENERAL*
+
+S1
+- Lines 3 & 4 a little tricky to distinguish on transverse plane
+- Glenoid plane difficult to ID on higher abduction in transverse plane
+	> Real struggle at 90 degrees of abduction
+- Humerus seems to translate posteriorly as abduction increases
+
+
+S2 [much more convinced with S1, and even more so S3 and S4 results than S2]
+- Potential shift in Ex Fix in ABER? Screws get closer to pin? Different camera view too? Camera view change isn't a huge issue unless it changes relationship between points
+- Quite a lot of overlap on lines for TP images; SS1 and SS4 relatively easy to identify, SS2 & SS3 hard to distinguish though
+- Humeral head a little difficult to get at in TP images (particulary ER positions); glenoid plane too
+- Humeral head extremely difficult to ID on 0abd TP images
+
+S3
+- Quite good SP images; demonstrates lower SS 'kink'
+- Slight movement of Ex Fix/screw points in APP [SP]?
+
+S4
+- Quite good SP images; demonstrates lower SS 'kink' particularly with 40N vs. 0N load
+- Most TP OK to see, but much easier in 40N condition
+
+S5
+- Good SP images; speciment doesn't really indicate the SS 'kink' as much (or at all in some), until you get to higher abd and ER
+- ***** Ex Fix and screws seem to move from 0 to 90 abd, redefined GP and pts at 90abd
+
+*GP*
+S1 - 0abd 0N SP; 0abd 0N TP
+S2 - 0abd 0N SP; 90abd 40N TP [almost impossible to identify glenoid plane in TP images]
+S3 - 90abd 0N SP; 90abd 0N TP
+S4 - 0abd 0N SP; 90abd 0N TP
+S5 - 0abd 0N SP +++ 90abs 0N SP [see note]
+
+
+*PHANTOMS*
+S1 - not completely spherical bead of 6.5mm diameter; toroid shape with 6mm diameter
+S2 - toroid with 6mm diameter? no scaling? screw length? [measurements suggest 5mm? may]
+S3 - not completely spherical bead of 6.5mm diameter
+S4 - not completely spherical bead of 6.5mm diameter
+S5+ - perfect sphere of 7.93mm diameter
+
+
+*LINES*
+S2 - screw (SS1), toroid (SS2), pin (SS3), none (SS4)
+S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
+
+
+*COMPLETED*
+- S1 0N and 40N, SP and TP for every position
+- S2 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP (~30 mins for SP analysis; ~60 mins for TP analysis)
+- S3 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S4 0N and 40N, SP and [TP - not yet...] for 0abd, 90abd, ABER, APP
