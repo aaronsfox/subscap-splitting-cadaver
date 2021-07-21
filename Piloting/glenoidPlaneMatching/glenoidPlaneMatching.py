@@ -189,7 +189,7 @@ def applyTransform(Y, tform):
 
     traceTA = s.sum()
 
-        Z = normY*np.dot(Y0, T) + muX
+    Z = normY*np.dot(Y0, T) + muX
 
     # transformation matrix
     if my < m:
