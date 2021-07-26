@@ -1,5 +1,7 @@
 *GENERAL*
 
+*Below currently only applies to 50% split*
+
 S1
 - Lines 3 & 4 a little tricky to distinguish on transverse plane
 - Glenoid plane difficult to ID on higher abduction in transverse plane
@@ -7,7 +9,7 @@ S1
 - Humerus seems to translate posteriorly as abduction increases
 
 
-S2 [much more convinced with S1, and even more so S3 and S4 results than S2]
+S2 [much more convinced with S1, and even more so S3, S4 and S5 results than S2]
 - Potential shift in Ex Fix in ABER? Screws get closer to pin? Different camera view too? Camera view change isn't a huge issue unless it changes relationship between points
 - Quite a lot of overlap on lines for TP images; SS1 and SS4 relatively easy to identify, SS2 & SS3 hard to distinguish though
 - Humeral head a little difficult to get at in TP images (particulary ER positions); glenoid plane too
@@ -22,15 +24,35 @@ S4
 - Most TP OK to see, but much easier in 40N condition
 
 S5
-- Good SP images; speciment doesn't really indicate the SS 'kink' as much (or at all in some), until you get to higher abd and ER
-- ***** Ex Fix and screws seem to move from 0 to 90 abd, redefined GP and pts at 90abd
+- Good SP images; specimen doesn't really indicate the SS 'kink' as much (or at all in some), until you get to higher abd and ER
+- ***** Ex Fix and screws seem to move from 0 to 90 abd, redefined GP and pts at 90abd + multiple on TP ]see below]
+- Good TP images, probably easiest TP images to see so far, gets a little tricky with ER though
+
+S6
+- Slightly strange upper SS lines on early SP images - adduction moment arm?
+- SP images don't really indicate the SS 'kink' as in other specimen
+- ***** Ex Fix and screws seem to move from 0 to 90 abd,  redefined GP and pts at 90abd 
+- ***** Phantom out of image in ABER 0N & 40N SP, APP 0N & 40N SP --- need to use other?
+- ***** Phantom could only get an estimate in 0abd 40N TP, ABER 0N TP, ABER 40N TP, APP 0N TP
+- Glenoid plane hard to identify on transverse images
+- Looks like some posterior translation on transverse images
+
+S7
+- New camera for S7? Different aspect ratio for SP images
+- Phantom sphere seems to disappear from some images
+- SS 'kink' not really obvious in SP images until ER applied
+
+
 
 *GP*
 S1 - 0abd 0N SP; 0abd 0N TP
 S2 - 0abd 0N SP; 90abd 40N TP [almost impossible to identify glenoid plane in TP images]
 S3 - 90abd 0N SP; 90abd 0N TP
 S4 - 0abd 0N SP; 90abd 0N TP
-S5 - 0abd 0N SP +++ 90abs 0N SP [see note]
+S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note]
+S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 40N SP +++ APP 0N SP
+S7 - 0abd 0N SP
+
 
 
 *PHANTOMS*
@@ -47,8 +69,11 @@ S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 
 
 *COMPLETED*
+*Below only for 50% split*
 - S1 0N and 40N, SP and TP for every position
 - S2 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP (~30 mins for SP analysis; ~60 mins for TP analysis)
 - S3 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S4 0N and 40N, SP and [TP - not yet...] for 0abd, 90abd, ABER, APP
+- S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S6 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S7 0N and 40N, SP [not TP yet...] for 0abd, 90abd, ABER, APP
