@@ -19,8 +19,9 @@ Created on Mon Jun 21 15:48:06 2021
         - Run the script to rename folders and files for the current iteration
         - Re-run again from the top level of the specimens folder structure
         
-    As noted in the points above, this script should be run from the specimens
-    top level folder within the Data folder.
+    If using the 'run' function this needs to run from it's own directory, and 
+    hence needs to navigate to the participants top level data folder.
+    ***THIS IS THE BETTER OPTION***
     
     Note that it is best to get all the details for the folder, but then close
     Windows Explorer to avoid any shared open issues.
@@ -34,31 +35,46 @@ import shutil
 from glob import glob
 import re
 
-# %% Set-up
+# %% ----- CHANGE THESE -----
+
+#Set the speciment ID name
+specimenName = 'S7_r'
 
 #Set the condition folder name and what to rename it to
-conditionName = '19-009R_specimen1_upper_25%_split'
-conditionRename = 'split25_upper'
+conditionName = '19-099R_specimen7_upper_25%'
+conditionRename = 'split25_upper' #split50, split25_upper, split25_lower
 
 #Set the position labels and what to rename to
-positionNames = ['_0abd', '_30abd', '_60abd', '_90abd', '_ABER', '_Apreh'] #need underscore as 0abd is in X0abd
+positionNames = ['_Abd0_', '_Abd30_', '_Abd60_',
+                 '_Abd90_', '_AbdER90_', '_Aprh_'] #need underscore as 0abd is in X0abd
 #Sometimes position names are modified within the same section, and hence need to use a 2nd option sometimes
-positionNames2 = ['_0deg', '_30deg', '_60deg', '_90deg', '_ABER', '_Apreh'] #need underscore as 0abd is in X0abd
-positionRenames = ['abd0', 'abd30', 'abd60', 'abd90', 'ABER', 'APP']
+positionNames2 = ['_0Abd_', '_30Abd_', '_60Abd_',
+                 '_90Abd_', '_90AbER_', '_Apreh_'] #need underscore as 0abd is in X0abd
 
-#Set the loading names and what to rename to
+#Set the loading names
 loadNames = ['_0N', '_10N', '_20N', '_30N', '_40N'] #need underscore as 0N is in 10N
-loadRenames = ['0N', '10N', '20N', '30N', '40N']
 
-#Set the plane names and what to rename to
-planeNames = ['SP', 'TP']
-planeRenames = ['SP', 'TP']
+#Set the plane names
+planeNames = [' SP', ' TP']
+planeNames2 = ['_SP', '_TP']
 
 #Set preface for scanning ID (there are sometimes multiples of certain scans to consider)
-prefaceLabel = 'D2810_T'
+prefaceLabel = 'D1203_T'
+
+# %% Set-up
+
+# ----- Ensure these align to above names -----
+
+#Set position, load and plane renaming (shouldn't change!)
+positionRenames = ['abd0', 'abd30', 'abd60', 'abd90', 'ABER', 'APP']
+loadRenames = ['0N', '10N', '20N', '30N', '40N']
+planeRenames = ['SP', 'TP']
+
+#Get starting directory
+homeDir = os.getcwd()
 
 #Navigate to the condition folder
-os.chdir(conditionName)
+os.chdir('..\\Data\\'+specimenName+'\\'+conditionName)
 
 #Get all the folder names to work through
 dirList = glob(os.getcwd()+'\\*\\')
@@ -131,11 +147,22 @@ for dd in range(len(dirList)):
         currLoadRename = loadRenames[currLoadInd]
     
     #Plane
+    #Set plane list checker to start in first list
+    planeListChecker = 1
     currPlane = []
     for plane in planeNames:
         if re.search(plane, scanLabel):
             #Set the current load to this label
             currPlane.append(plane)
+    #Check if empty
+    if len(currPlane) < 1:
+        #Check in second set of position labels
+        for plane in planeNames2:
+            if re.search(plane, scanLabel):
+                #Set the current position to this label
+                currPlane.append(plane)
+        #Reset position checker variable to look in second list
+        planeListChecker = 2
     #Check if empty
     if len(currPlane) < 1:
         raise ValueError('No plane identified in string')
@@ -145,8 +172,11 @@ for dd in range(len(dirList)):
     else:
         #Flatten list
         currPlane = currPlane[0]
-        #Identify the index of the position in the names list
-        currPlaneInd = planeNames.index(currPlane)
+        #Identify the index of the plane in the names list
+        if planeListChecker == 1:
+            currPlaneInd = planeNames.index(currPlane)
+        elif planeListChecker == 2:
+            currPlaneInd = planeNames2.index(currPlane)
         #Set the rename position based on the index
         currPlaneRename = planeRenames[currPlaneInd]
         
@@ -196,5 +226,10 @@ else:
     #Rename the folder
     #Need to use shutil here rather than os to get around permission errors
     shutil.move(conditionName, conditionRename)
+    
+# %% Finish up
+    
+#Return to home directory
+os.chdir(homeDir)
         
 # %% ----- end of fileRenamer.py -----

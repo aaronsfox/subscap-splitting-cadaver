@@ -15,6 +15,17 @@ Created on Wed Jun 23 10:46:38 2021
     This script should be run from the 'Code' folder, and with the appropriate
     specimen and Latarjet condition labels will be able to identify the data that
     needs to be processed.
+	
+	TODO: QUALITY CONTROL --- humeral head size consistency, phantom size consistency
+	
+	TODO: QUALITY CONTROL --- image series for matching across glenoid planes
+	
+	TODO: modify glenoid plane creation to take in a reference image for a list of others;
+	put everyones definitions in a dictionary layout to look-up. 'T' and numbers possibly indicate
+	time and hence could provide testing order...?
+	
+	TODO: lack of phantom on certain images means we should take average where available (i.e.
+	print out what the average and error is to confirm similar image scales across series)
     
 """
 
