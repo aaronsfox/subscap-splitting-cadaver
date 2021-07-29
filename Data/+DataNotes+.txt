@@ -41,6 +41,9 @@ S7
 - New camera for S7? Different aspect ratio for SP images
 - Phantom sphere seems to disappear from some images
 - SS 'kink' not really obvious in SP images until ER applied
+- Different camera for TP images, not as high quality
+- No phantom in TP images due to small window
+- Some serious posterior translation in ABER and APP in TP
 
 
 
@@ -51,7 +54,7 @@ S3 - 90abd 0N SP; 90abd 0N TP
 S4 - 0abd 0N SP; 90abd 0N TP
 S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note]
 S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 40N SP +++ APP 0N SP
-S7 - 0abd 0N SP
+S7 - 0abd 0N SP/TP
 
 
 
@@ -76,4 +79,4 @@ S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 - S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S6 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S7 0N and 40N, SP [not TP yet...] for 0abd, 90abd, ABER, APP
+- S7 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP]
