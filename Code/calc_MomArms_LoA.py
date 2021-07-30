@@ -19,11 +19,7 @@ Created on Wed Jun 23 10:46:38 2021
 	TODO: QUALITY CONTROL --- humeral head size consistency, phantom size consistency
 	
 	TODO: QUALITY CONTROL --- image series for matching across glenoid planes
-	
-	TODO: modify glenoid plane creation to take in a reference image for a list of others;
-	put everyones definitions in a dictionary layout to look-up. 'T' and numbers possibly indicate
-	time and hence could provide testing order...?
-	
+
 	TODO: lack of phantom on certain images means we should take average where available (i.e.
 	print out what the average and error is to confirm similar image scales across series)
     
@@ -45,17 +41,13 @@ import re
 ##### ----- CHECK AND CHANGE THESE PARAMETERS EACH RUN ----- #####
 
 #Specimen to analyse
-specimen = 'S1_r' #specimen number and label for limb tested
+specimen = 'S3_r' #specimen number and label for limb tested
 
 #Latarjet condition to analyse
 latarjetCond = 'split50' #split50, split25_upper, split25_lower
 
 #Set phantom diameter for scaling
 phantomDiameter = 6.5
-
-#Conditions where glenoid plane has been identified
-glenoidDefCond_SP = 'abd0_0N'
-glenoidDefCond_TP = 'abd0_0N'
 
 # %% Define functions
 
@@ -278,12 +270,22 @@ def visDigitised():
                     c = 'red', lw = 1, ls = '--')
         
     #Plot phantom points
-    ax.scatter(phantomPoints['X'], phantomPoints['Y'], s = 10, c = 'magenta')
-    
-    #Plot phantom fitted circle
-    ax.add_artist(plt.Circle((phantomCentreX, phantomCentreY), phantomRadius,
-                             edgecolor = 'magenta', facecolor = 'none'))
-    ax.scatter(phantomCentreX, phantomCentreY, s = 75, c = 'magenta', marker = '+')
+    if os.path.isfile('phantom.csv'):
+        
+        #Load file
+        phantomPoints = pd.read_csv('phantom.csv')
+        
+        #Plot points
+        ax.scatter(phantomPoints['X'], phantomPoints['Y'], s = 10, c = 'magenta')
+        
+        #Fit circle
+        phantomCentreX, phantomCentreY, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
+                                                                  phantomPoints['Y'].to_numpy())
+        
+        #Plot phantom fitted circle
+        ax.add_artist(plt.Circle((phantomCentreX, phantomCentreY), phantomRadius,
+                                  edgecolor = 'magenta', facecolor = 'none'))
+        ax.scatter(phantomCentreX, phantomCentreY, s = 75, c = 'magenta', marker = '+')
     
     #Plot glenoid plane points and fit line
     ax.scatter(gpPoints['X'], gpPoints['Y'], s = 10, c = 'yellow')
@@ -303,26 +305,15 @@ def visGlenoidFit():
     #Create figure and axes
     fig, ax = plt.subplots(nrows = 1, ncols = 2, figsize = (8,4))
     
-    #Plot reference image and digitised points
-    if 'SP' in currPlaneName:                
-        #Plot image
-        ax[0].imshow(refImg_SP, cmap = 'gray', origin = 'upper')
-        #Plot originally digitised reference points
-        ax[0].scatter(refPts_SP['X'], refPts_SP['Y'], c = 'green', s = 7)   
-        #Plot glenoid points and fit a line
-        ax[0].scatter(gpDef_SP['X'], gpDef_SP['Y'], c = 'yellow', s = 7)
-        m,c = np.polyfit(gpDef_SP['X'], gpDef_SP['Y'], 1)
-        ax[0].plot(gpDef_SP['X'], m * gpDef_SP['X'] + c, c = 'yellow', lw = 1)
-        
-    elif 'TP' in currPlaneName:                
-        #Plot image
-        ax[0].imshow(refImg_TP, cmap = 'gray', origin = 'upper')
-        #Plot originally digitised reference points
-        ax[0].scatter(refPts_TP['X'], refPts_TP['Y'], c = 'green', s = 7)
-        #Plot glenoid points and fit a line
-        ax[0].scatter(gpDef_TP['X'], gpDef_TP['Y'], c = 'yellow', s = 7)
-        m,c = np.polyfit(gpDef_TP['X'], gpDef_TP['Y'], 1)
-        ax[0].plot(gpDef_TP['X'], m * gpDef_TP['X'] + c, c = 'yellow', lw = 1)
+    #Plot reference image and digitised points              
+    #Plot image
+    ax[0].imshow(refImg, cmap = 'gray', origin = 'upper')
+    #Plot originally digitised reference points
+    ax[0].scatter(refPts['X'], refPts['Y'], c = 'green', s = 7)   
+    #Plot glenoid points and fit a line
+    ax[0].scatter(gpPts[:,0], gpPts[:,1], c = 'yellow', s = 7)
+    m,c = np.polyfit(gpPts[:,0], gpPts[:,1], 1)
+    ax[0].plot(gpPts[:,0], m * gpPts[:,0] + c, c = 'yellow', lw = 1)
     
     #Turn off axes
     ax[0].axis('off')
@@ -359,10 +350,7 @@ def visGlenoidFit():
     plt.tight_layout()
 
 #Calculate and export moment arms
-def calcMomentArms():    
-    
-    #### TODO: currently works well for right arm in SP and TP
-    #### Probably need to consider adaptations for left arm (i.e. + vs -)
+def calcMomentArms():
     
     #Set variable to store moment arm calculations in
     maList = []
@@ -373,9 +361,6 @@ def calcMomentArms():
     #Set variable for axes
     whichAx = [[0,0], [0,1],
                [1,0], [1,1]]
-    
-    #Set phantom scale
-    phantomScale = phantomRadius / (phantomDiameter/2)
     
     #Set point to extend subscapularis line to based on humeral head
     #position (i.e. halfway between humeral head and edge of image)
@@ -470,7 +455,10 @@ def calcMomentArms():
         # ma = (math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))) / phantomScale
         
         #Use cross product to calculate moment arm
-        ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale
+        if 'SP' in currPlaneName:
+            ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_SP
+        elif 'TP' in currPlaneName:
+            ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_TP
         
         # #Check if moment arm is positive (abduction/IR) vs. negative (adduction/ER)
         # #This considers proper orientation of image
@@ -599,13 +587,21 @@ def calcLoA():
             cPerp = (mPerp * intX - intY) * -1
             #Visualise
             imAx.plot([0,intX], [cPerp, intY], c = 'blue', lw = 1, ls = '--')
-        #Solve for y at maximum X if transverse plane
+        #Solve for y at maximum or minimum X if transverse plane
+        #Depends on if left or right limb for specimen
         elif 'TP' in currPlaneName:
-            #Solver for y at maximum x-value
-            cPerp = (mPerp * intX - intY) * -1
-            cMax = mPerp * img.shape[1] + cPerp
-            #Visualise
-            imAx.plot([intX, img.shape[1]], [intY, cMax], c = 'blue', lw = 1, ls = '--')
+            if specimen.split('_')[1] == 'r':
+                #Solver for y at maximum x-value
+                cPerp = (mPerp * intX - intY) * -1
+                cMax = mPerp * img.shape[1] + cPerp
+                #Visualise
+                imAx.plot([intX, img.shape[1]], [intY, cMax], c = 'blue', lw = 1, ls = '--')
+            elif specimen.split('_')[1] == 'l':
+                #Solve for y-intercept of new line
+                #Use intercept points for line
+                cPerp = (mPerp * intX - intY) * -1
+                #Visualise
+                imAx.plot([0,intX], [cPerp, intY], c = 'blue', lw = 1, ls = '--')
         
         #To calculate the line of action we revert to a standard lower left origin
         #compared to the upper left origin of the images --- therefore we can work
@@ -675,7 +671,11 @@ def calcLoA():
         if 'SP' in currPlaneName:
             lnAx.plot([0,maxLim/2*-1], [0,0], lw = 2, c = 'black') #x-axis
         elif 'TP' in currPlaneName:
-            lnAx.plot([0,maxLim/2], [0,0], lw = 2, c = 'black') #x-axis
+            #Direction depends on specimen limb
+            if specimen.split('_')[1] == 'r':
+                lnAx.plot([0,maxLim/2], [0,0], lw = 2, c = 'black') #x-axis
+            elif specimen.split('_')[1] == 'l':
+                lnAx.plot([0,maxLim/2*-1], [0,0], lw = 2, c = 'black') #x-axis
         lnAx.plot([0,0], [0,maxLim/2], lw = 2, c = 'black') #y-axis
         
         #Fit muscle line
@@ -685,6 +685,8 @@ def calcLoA():
         lnAx.plot(np.array((0,np.min(rx))),
                   rotM * np.array((0,np.min(rx))) + rotC,
                   c = 'red', lw = 1, ls = '--', zorder = 0)
+        
+        #### TODO: EXTEND TO APPROPRIATE EDGE OF PLOT FOR BEST VISUALISATION...
         
         #Turn off axes labels
         lnAx.axis('off')
@@ -702,15 +704,26 @@ def calcLoA():
                 lineOfAction = 180
         #Transverse plane calculations
         elif 'TP' in currPlaneName:
-            if rotM > 0:
-                lineOfAction = 180 + np.degrees(np.arctan(rotM))
-            elif rotM < 0:
-                #Inferiorly directed line of action (i.e. < 180 degrees)
-                lineOfAction = 360 - (np.degrees(np.arctan(rotM))*-1)
-            elif rotM == 0:
-                #180 degree (i.e. straight compression) line of action
-                lineOfAction = 180
-        
+            #Calculations depend on specimen limb
+            if specimen.split('_')[1] == 'r':
+                if rotM > 0:
+                    lineOfAction = 180 + np.degrees(np.arctan(rotM))
+                elif rotM < 0:
+                    #Inferiorly directed line of action (i.e. < 180 degrees)
+                    lineOfAction = 360 - (np.degrees(np.arctan(rotM))*-1)
+                elif rotM == 0:
+                    #180 degree (i.e. straight compression) line of action
+                    lineOfAction = 180
+            elif specimen.split('_')[1] == 'l':
+                if rotM > 0:
+                    lineOfAction = 180 - np.degrees(np.arctan(rotM))
+                elif rotM < 0:
+                    #Inferiorly directed line of action (i.e. < 180 degrees)
+                    lineOfAction = 180 + (np.degrees(np.arctan(rotM))*-1)
+                elif rotM == 0:
+                    #180 degree (i.e. straight compression) line of action
+                    lineOfAction = 180
+                    
         #Print line of action in top left corner of axes
         lnAx.text(0.025, 0.9,
                   'LoA = '+str(np.round(lineOfAction,2))+u'\u00b0',
@@ -821,51 +834,199 @@ dirList = glob(os.getcwd()+'\\*\\')
 
 # %% Get reference data for estimating glenoid planes
 
-#This code considers that the glenoid plane has been defined in the condition 
-#outlined in the parameters to change section of the script
+#Get global directory list for each plane
+dirList_SP = [ii for ii in dirList if '_SP_' in ii]
+dirList_TP = [ii for ii in dirList if '_TP_' in ii]
 
-#Identify directories that are scapular vs. transverse plane
-#Ignore the defining directory
-dirList_SP = [ii for ii in dirList if '_SP_' in ii and glenoidDefCond_SP not in ii]
-dirList_TP = [ii for ii in dirList if '_SP_' in ii and glenoidDefCond_TP not in ii]
+#Loop through directory lists and identify which have defined glenoid planes
+#If they do they are added as a key in the dictionary and set as the current
+#definition directory. Any subsequent directories without a glenoid plane are
+#mapped to that key to use it in defining it's glenoid plane
 
-#Identify glenoid plane defined directories
-glenoidDefDir_SP = [ii for ii in dirList if glenoidDefCond_SP+'_SP' in ii][0]
-glenoidDefDir_TP = [ii for ii in dirList if glenoidDefCond_SP+'_TP' in ii][0]
-
-#Navigate to the definition directory and read in glenoid data
+#There are cases though where the initial directories may be searched through
+#and not have a glenoid plane definition directory selected already. Hence we
+#first need to loop through the directories to find the first glenoid definition
+#directory to set as the starting 'currDefDir'
 
 #Scapular plane
-os.chdir(glenoidDefDir_SP)
+glenoidDefCond_SP = {}
 
-#Check whether to analyse based on presence of file
-#Load glenoid points and digitised reference points
-gpDef_SP = pd.read_csv('gp.csv')
-refPts_SP = pd.read_csv('pts.csv')
+#Check for starting directory
+for currDir in dirList_SP:
+    #Navigate to directory
+    os.chdir(currDir)
+    #Check if glenoid plane file present
+    if os.path.isfile('gp.csv'):
+        #Add as key to dictionary
+        glenoidDefCond_SP[currDir] = []
+        #Set as the starting definition directory
+        currDefDir = currDir
+        #Exit loop with break
+        break
+#Return to home directory
+os.chdir('..')
 
-#Read image file too
-refImageFile = glob('*_proc.tif')[0]
-#Load image
-refImg_SP = io.imread(refImageFile)
-
-#Return to upper directory
+#Loop through directories
+for currDir in dirList_SP:
+    #Navigate to directory
+    os.chdir(currDir)
+    #Check if glenoid plane file present
+    if os.path.isfile('gp.csv'):
+        #Add as key to dictionary
+        #Check first if it's already in there from initial definition
+        if currDir not in glenoidDefCond_SP.keys():
+            glenoidDefCond_SP[currDir] = []
+        #Set as current definition directory
+        currDefDir = currDir
+    else:
+        #Append the current directory to the current definition key
+        glenoidDefCond_SP[currDefDir].append(currDir)
+#Return to home directory
 os.chdir('..')
 
 #Transverse plane
-os.chdir(glenoidDefDir_TP)
+glenoidDefCond_TP = {}
 
-#Check whether to analyse based on presence of file
-#Load glenoid points and digitised reference points
-gpDef_TP = pd.read_csv('gp.csv')
-refPts_TP = pd.read_csv('pts.csv')
-
-#Read image file too
-refImageFile = glob('*_proc.tif')[0]
-#Load image
-refImg_TP = io.imread(refImageFile)
-
-#Return to upper directory
+#Check for starting directory
+for currDir in dirList_TP:
+    #Navigate to directory
+    os.chdir(currDir)
+    #Check if glenoid plane file present
+    if os.path.isfile('gp.csv'):
+        #Add as key to dictionary
+        glenoidDefCond_TP[currDir] = []
+        #Set as the starting definition directory
+        currDefDir = currDir
+        #Exit loop with break
+        break
+#Return to home directory
 os.chdir('..')
+
+#Loop through directories
+for currDir in dirList_TP:
+    #Navigate to directory
+    os.chdir(currDir)
+    #Check if glenoid plane file present
+    if os.path.isfile('gp.csv'):
+        #Add as key to dictionary
+        #Check first if it's already in there from initial definition
+        if currDir not in glenoidDefCond_TP.keys():
+            glenoidDefCond_TP[currDir] = []
+        #Set as current definition directory
+        currDefDir = currDir
+    else:
+        #Append the current directory to the current definition key
+        glenoidDefCond_TP[currDefDir].append(currDir)
+#Return to home directory
+os.chdir('..')
+        
+#Navigate to the definition directories and read in glenoid data
+
+#Scapular plane
+
+#Create dictionary to store gp, pts and img data
+gpData_SP = {val:{'gp': [], 'pts':[], 'refImg':[]} for val in list(glenoidDefCond_SP.keys())}
+
+#Loop through the definition directories and grab data
+for defDir in gpData_SP.keys():
+    #Navigate to directory
+    os.chdir(defDir)
+    #Load glenoid plane data and append to dictionary
+    gpData_SP[defDir]['gp'].append(pd.read_csv('gp.csv'))
+    #Load points data and append to dictionary
+    gpData_SP[defDir]['pts'].append(pd.read_csv('pts.csv'))
+    #Load ref image data and append to dictionary
+    gpData_SP[defDir]['refImg'].append(io.imread(glob('*_proc.tif')[0]))
+    #Return to home directory
+    os.chdir('..')
+
+#Transverse plane
+    
+#Create dictionary to store gp, pts and img data
+gpData_TP = {val:{'gp': [], 'pts':[], 'refImg':[]} for val in list(glenoidDefCond_TP.keys())}
+
+#Loop through the definition directories and grab data
+for defDir in gpData_TP.keys():
+    #Navigate to directory
+    os.chdir(defDir)
+    #Load glenoid plane data and append to dictionary
+    gpData_TP[defDir]['gp'].append(pd.read_csv('gp.csv'))
+    #Load points data and append to dictionary
+    gpData_TP[defDir]['pts'].append(pd.read_csv('pts.csv'))
+    #Load ref image data and append to dictionary
+    gpData_TP[defDir]['refImg'].append(io.imread(glob('*_proc.tif')[0]))
+    #Return to home directory
+    os.chdir('..')
+
+# %% Create scaling factor based on phantom size
+    
+##### TODO: consider if a plane doesn't have any phantoms?????    
+
+#Taking an average became necessary given the phantom was not viewable in every image
+
+#Scapular plane
+    
+#Set list to store phantom sizes in
+phantomScaleAll = []
+
+#Loop through the directories
+for currDir in dirList_SP:
+    
+    #Navigate to directory
+    os.chdir(currDir)
+    
+    #Load the phantom if available
+    if os.path.isfile('phantom.csv'):
+        
+        #Load the points
+        phantomPoints = pd.read_csv('phantom.csv')
+        
+        #Fit circle to phantom bead
+        _, _, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
+                                        phantomPoints['Y'].to_numpy())
+        
+        #Add to scaling size list            
+        phantomScaleAll.append(phantomRadius / (phantomDiameter/2))
+        
+    #Return to home directory
+    os.chdir('..')
+    
+#Take average scale size to apply
+#Print mean and SD to check consistency
+phantomScale_SP = np.mean(phantomScaleAll)
+print(f'Scapular plane phantom scale: {np.round(phantomScale_SP,2)} \u00B1 {np.round(np.std(phantomScaleAll),2)}')
+
+#Transverse plane
+
+#Set list to store phantom sizes in
+phantomScaleAll = []
+
+#Loop through the directories
+for currDir in dirList_TP:
+    
+    #Navigate to directory
+    os.chdir(currDir)
+    
+    #Load the phantom if available
+    if os.path.isfile('phantom.csv'):
+        
+        #Load the points
+        phantomPoints = pd.read_csv('phantom.csv')
+        
+        #Fit circle to phantom bead
+        _, _, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
+                                        phantomPoints['Y'].to_numpy())
+        
+        #Add to scaling size list            
+        phantomScaleAll.append(phantomRadius / (phantomDiameter/2))
+        
+    #Return to home directory
+    os.chdir('..')
+    
+#Take average scale size to apply
+#Print mean and SD to check consistency
+phantomScale_TP = np.mean(phantomScaleAll)
+print(f'Scapular plane phantom scale: {np.round(phantomScale_TP,2)} \u00B1 {np.round(np.std(phantomScaleAll),2)}')    
 
 # %% Perform calculations
 
@@ -962,12 +1123,9 @@ for currDir in dirList:
         #Humeral head points
         hhPoints = pd.read_csv('hh.csv')
         
-        #Phantom points
-        phantomPoints = pd.read_csv('phantom.csv')
-        
         #Glenoid plane
         #Check if this condition is the one where the plane was defined
-        if currDir == glenoidDefDir_SP or currDir == glenoidDefDir_TP:
+        if currDir in list(glenoidDefCond_SP.keys()) or currDir in list(glenoidDefCond_TP.keys()):
             
             #Simply load in glenoid points
             gpPoints = pd.read_csv('gp.csv')
@@ -979,17 +1137,35 @@ for currDir in dirList:
             #Import the digitised reference points from the current image
             refPts = pd.read_csv('pts.csv')
             
-            #Calculate procrustes transformation between points
-            
-            #Set ref points based on plane
-            if 'SP' in currPlaneName:            
-                refDigPts = np.transpose(np.array([refPts_SP['X'].to_numpy(),
-                                                   refPts_SP['Y'].to_numpy()]))
+            #Identify which reference image should be used for current directory
+            if 'SP' in currPlaneName:
+                #Search through scapular plane dictionary
+                for checkDir in glenoidDefCond_SP.keys():
+                    if currDir in glenoidDefCond_SP[checkDir]:
+                        #Set the reference directory to current option
+                        refDir = checkDir
+                        #Break the loop to exit if done
+                        break
             elif 'TP' in currPlaneName:
-                refDigPts = np.transpose(np.array([refPts_TP['X'].to_numpy(),
-                                                   refPts_TP['Y'].to_numpy()]))
-                
-            #Set points to transpose
+                #Search through scapular plane dictionary
+                for checkDir in glenoidDefCond_SP.keys():
+                    if currDir in glenoidDefCond_TP[checkDir]:
+                        #Set the reference directory to current option
+                        refDir = checkDir
+                        #Break the loop to exit if done
+                        break
+
+            #Calculate procrustes transformation between points
+                    
+            #Extract the appropriate points to an array
+            if 'SP' in currPlaneName:
+                refDigPts = np.transpose(np.array([gpData_SP[refDir]['pts'][0]['X'].to_numpy(),
+                                                   gpData_SP[refDir]['pts'][0]['Y'].to_numpy()]))
+            elif 'TP' in currPlaneName:
+                refDigPts = np.transpose(np.array([gpData_TP[refDir]['pts'][0]['X'].to_numpy(),
+                                                   gpData_TP[refDir]['pts'][0]['Y'].to_numpy()]))
+
+            #Set points to transform
             transDigPts =  np.transpose(np.array([refPts['X'].to_numpy(),
                                                   refPts['Y'].to_numpy()]))
                 
@@ -999,14 +1175,22 @@ for currDir in dirList:
             #Apply the transformation to the reference glenoid plane points
             #Get gp points in array based on current plane
             if 'SP' in currPlaneName:
-                gpPts = np.transpose(np.array([gpDef_SP['X'], gpDef_SP['Y']]))
+                gpPts = np.transpose(np.array([gpData_SP[refDir]['gp'][0]['X'],
+                                               gpData_SP[refDir]['gp'][0]['Y']]))
             elif 'TP' in currPlaneName:
-                gpPts = np.transpose(np.array([gpDef_TP['X'], gpDef_TP['Y']]))
+                gpPts = np.transpose(np.array([gpData_TP[refDir]['gp'][0]['X'],
+                                               gpData_TP[refDir]['gp'][0]['Y']]))
             
             #Transform reference glenoid points to new array
             gpPts_trans = np.zeros(gpPts.shape)
             for pp in range(gpPts.shape[0]):
                 gpPts_trans[pp] = tform['rotation'].dot(gpPts[pp]) - tform['translation']
+             
+            #Extract the relevant reference image
+            if 'SP' in currPlaneName:
+                refImg = gpData_SP[refDir]['refImg'][0]
+            elif 'TP' in currPlaneName:
+                refImg = gpData_TP[refDir]['refImg'][0]            
                 
             #Visualise new points on image alongside point alignment comparison
             visGlenoidFit()
@@ -1029,10 +1213,6 @@ for currDir in dirList:
         hhCentreX, hhCentreY, hhRadius = fitCircle(hhPoints['X'].to_numpy(),
                                                    hhPoints['Y'].to_numpy())
         
-        #Fit circle to phantom bead
-        phantomCentreX, phantomCentreY, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
-                                                                  phantomPoints['Y'].to_numpy())
-        
         #Visualise imported points
         visDigitised()
         #Save figure
@@ -1041,15 +1221,11 @@ for currDir in dirList:
         plt.close()
         
         #Moment arm calculations and visualisation
-        ##### TODO: shift up to function --- consider how this works with left arm???
-        ##### Will need to consider image orientation to ensure moment arm direction
-        ##### remains appropriate for + vs. -
         calcMomentArms()
                              
         # %% Calculate lines of action & stability ratios
                              
         #Line of action calculations and visualisation
-        ##### TODO: consider right vs. left arm???
         calcLoA()
         
     # %% Finish up in current directory
