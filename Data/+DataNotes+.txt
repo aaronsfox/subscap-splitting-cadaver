@@ -44,6 +44,7 @@ S7
 - Different camera for TP images, not as high quality
 - No phantom in TP images due to small window
 - Some serious posterior translation in ABER and APP in TP
+- Worked out mini sphere size based on its size relative to larger sphere in corresponding images to set TP phantom
 
 
 
@@ -54,16 +55,18 @@ S3 - 90abd 0N SP; 90abd 0N TP
 S4 - 0abd 0N SP; 90abd 0N TP
 S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note]
 S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 40N SP +++ APP 0N SP
-S7 - 0abd 0N SP/TP
+S7 - 0abd 0N TP; all in SP as poor points available for registration/too much movement
 
 
 
 *PHANTOMS*
-S1 - not completely spherical bead of 6.5mm diameter; toroid shape with 6mm diameter
-S2 - toroid with 6mm diameter? no scaling? screw length? [measurements suggest 5mm? may]
-S3 - not completely spherical bead of 6.5mm diameter
-S4 - not completely spherical bead of 6.5mm diameter
-S5+ - perfect sphere of 7.93mm diameter
+S1 - not completely spherical bead of 6.5mm diameter [both SP & TP]
+S2 - toroid of 6mm diameter [both SP & TP]
+S3 - not completely spherical bead of 6.5mm diameter [both SP & TP]
+S4 - not completely spherical bead of 6.5mm diameter [both SP & TP]
+S5 - perfect sphere of 7.93mm diameter [both SP & TP]
+S6 - perfect sphere of 7.93mm diameter [both SP & TP]
+S7 - perfect sphere of 7.93mm diameter [SP] / mini sphere of 2.45 in diameter [TP]
 
 
 *LINES*
@@ -71,10 +74,21 @@ S2 - screw (SS1), toroid (SS2), pin (SS3), none (SS4)
 S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 
 
-*COMPLETED*
+*DIGITISED*
 *Below only for 50% split*
 - S1 0N and 40N, SP and TP for every position
 - S2 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP (~30 mins for SP analysis; ~60 mins for TP analysis)
+- S3 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S6 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S7 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP]
+
+
+*PROCESSED*
+*Below only for 50% split*
+- S1 0N and 40N, SP and TP for every position
+- S2 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S3 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
