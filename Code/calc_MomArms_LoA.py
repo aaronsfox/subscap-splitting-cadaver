@@ -15,13 +15,6 @@ Created on Wed Jun 23 10:46:38 2021
     This script should be run from the 'Code' folder, and with the appropriate
     specimen and Latarjet condition labels will be able to identify the data that
     needs to be processed.
-	
-	TODO: QUALITY CONTROL --- humeral head size consistency, phantom size consistency
-	
-	TODO: QUALITY CONTROL --- image series for matching across glenoid planes
-
-	TODO: lack of phantom on certain images means we should take average where available (i.e.
-	print out what the average and error is to confirm similar image scales across series)
     
 """
 
@@ -35,19 +28,25 @@ import pandas as pd
 import math
 from skimage import io
 import re
+from shutil import copy2, rmtree
 
 # %% Parameters to change
 
 ##### ----- CHECK AND CHANGE THESE PARAMETERS EACH RUN ----- #####
 
 #Specimen to analyse
-specimen = 'S3_r' #specimen number and label for limb tested
+specimen = 'S7_r' #specimen number and label for limb tested
 
 #Latarjet condition to analyse
 latarjetCond = 'split50' #split50, split25_upper, split25_lower
 
+#Set phantom type
+phantomType_SP = 'sphere' #sphere, toroid
+phantomType_TP = 'sphere' #sphere, toroid
+
 #Set phantom diameter for scaling
-phantomDiameter = 6.5
+phantomDiameter_SP = 7.93
+phantomDiameter_TP = 2.45
 
 # %% Define functions
 
@@ -341,8 +340,12 @@ def visGlenoidFit():
                lw = 1, ls = '--')
     
     #Set titles
-    ax[0].set_title(f'Ref. Img. / Res. Err. on Points: {np.round(resErr,5)}',
-                    fontsize = 10, fontweight = 'bold')
+    if 'SP' in currPlaneName:
+        ax[0].set_title(f'Ref. Img. / Res. Err. on Points: {np.round(resErr/phantomScale_SP,5)}',
+                        fontsize = 10, fontweight = 'bold')
+    elif 'TP' in currPlaneName:
+        ax[0].set_title(f'Ref. Img. / Res. Err. on Points: {np.round(resErr/phantomScale_TP,5)}',
+                        fontsize = 10, fontweight = 'bold')
     ax[1].set_title('Current Img. Estimated Glenoid Plane',
                     fontsize = 10, fontweight = 'bold')
 
@@ -577,6 +580,58 @@ def calcLoA():
         intX, intY = lineIntersect(gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2)
         imAx.scatter(intX, intY, c = 'blue', s = 5, zorder = 4)
         
+        #Put a check in place to add a point to the subscap line if the points
+        #are all on the wrong side of the intercept
+        if 'SP' in currPlaneName:
+            
+            #Check if all points are to the left of the intercept
+            if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) > 0):
+                #Calculate a point on the subscap line to the right of the intercept
+                #The makeshift X point is 5% across from the intercept relative
+                #to the maximum of the X axis                
+                makeshiftX = intX + (imAx.get_xlim()[1] - intX) * 0.05
+                makeshiftY = subscapM * makeshiftX + subscapC
+                #Plot the point
+                imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
+                #Add this point to the current subscapularis line for calculations
+                subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
+                                                                        'Y': makeshiftY},
+                                                                       ignore_index = True)  
+                
+        elif 'TP' in currPlaneName:
+            
+            if specimen.split('_')[1] == 'l':
+                
+                #Check if all points are to the left of the intercept
+                if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) > 0):
+                    #Calculate a point on the subscap line to the right of the intercept
+                    #The makeshift X point is 5% across from the intercept relative
+                    #to the maximum of the X axis                
+                    makeshiftX = intX + (imAx.get_xlim()[1] - intX) * 0.05
+                    makeshiftY = subscapM * makeshiftX + subscapC
+                    #Plot the point
+                    imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
+                    #Add this point to the current subscapularis line for calculations
+                    subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
+                                                                            'Y': makeshiftY},
+                                                                           ignore_index = True)
+                    
+            elif specimen.split('_')[1] == 'r':
+                
+                #Check if all points are to the left of the intercept
+                if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) < 0):
+                    #Calculate a point on the subscap line to the right of the intercept
+                    #The makeshift X point is 5% across from the intercept relative
+                    #to the maximum of the X axis                
+                    makeshiftX = intX - (intX - imAx.get_xlim()[0]) * 0.05
+                    makeshiftY = subscapM * makeshiftX + subscapC
+                    #Plot the point
+                    imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
+                    #Add this point to the current subscapularis line for calculations
+                    subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
+                                                                            'Y': makeshiftY},
+                                                                           ignore_index = True)
+        
         #Determine slope (i.e. negative reciprocal) of perpendicular line to glenoid plane
         mPerp = 1 / (-glenoidM)
         
@@ -685,9 +740,7 @@ def calcLoA():
         lnAx.plot(np.array((0,np.min(rx))),
                   rotM * np.array((0,np.min(rx))) + rotC,
                   c = 'red', lw = 1, ls = '--', zorder = 0)
-        
-        #### TODO: EXTEND TO APPROPRIATE EDGE OF PLOT FOR BEST VISUALISATION...
-        
+                
         #Turn off axes labels
         lnAx.axis('off')
     
@@ -710,10 +763,11 @@ def calcLoA():
                     lineOfAction = 180 + np.degrees(np.arctan(rotM))
                 elif rotM < 0:
                     #Inferiorly directed line of action (i.e. < 180 degrees)
-                    lineOfAction = 360 - (np.degrees(np.arctan(rotM))*-1)
+                    lineOfAction = 180 - (np.degrees(np.arctan(rotM))*-1)
                 elif rotM == 0:
                     #180 degree (i.e. straight compression) line of action
                     lineOfAction = 180
+                    
             elif specimen.split('_')[1] == 'l':
                 if rotM > 0:
                     lineOfAction = 180 - np.degrees(np.arctan(rotM))
@@ -741,12 +795,16 @@ def calcLoA():
             #Get the point at the edge
             srCalcPt = np.array([maxLim, rotM * maxLim + rotC])
             
-        #If it is in the transverse plane, we'll use the min x-limit
+        #If it is in the transverse plane, we'll use the max or min x-limit
+        #This depends on the limb used
         if 'TP' in currPlaneName:
-            
-            #Get the point at the edge
-            srCalcPt = np.array([maxLim*-1, rotM * (maxLim*-1) + rotC])
-            
+            if '_r' in specimen:
+                #Get the point at the edge
+                srCalcPt = np.array([maxLim*-1, rotM * (maxLim*-1) + rotC])
+            elif '_l' in specimen:
+                #Get the point at the edge
+                srCalcPt = np.array([maxLim, rotM * maxLim + rotC])
+
         #Calculate the directional cosines for the axes
         #This notes that the vector starts at the axes origin
         
@@ -777,10 +835,16 @@ def calcLoA():
     #Close figure
     plt.close()
     
-    #Convert moment arm data to dataframe and export
+    #Convert line of action data to dataframe and export
     pd.DataFrame(list(zip(subscapNames, loaList)),
                  columns = ['subscapLine', 'lineOfAction']).to_csv(
                      'lineOfActionData.csv',
+                     index = False)
+                     
+    #Convert stability ration to dataframe and export
+    pd.DataFrame(list(zip(subscapNames, srList)),
+                 columns = ['subscapLine', 'stabilityRatio']).to_csv(
+                     'stabilityRatioData.csv',
                      index = False)
 
 # %% Set-up
@@ -957,11 +1021,12 @@ for defDir in gpData_TP.keys():
     gpData_TP[defDir]['refImg'].append(io.imread(glob('*_proc.tif')[0]))
     #Return to home directory
     os.chdir('..')
+    
+#Print out confirmation
+print('Glenoid plane data extracted.')
 
 # %% Create scaling factor based on phantom size
     
-##### TODO: consider if a plane doesn't have any phantoms?????    
-
 #Taking an average became necessary given the phantom was not viewable in every image
 
 #Scapular plane
@@ -977,16 +1042,25 @@ for currDir in dirList_SP:
     
     #Load the phantom if available
     if os.path.isfile('phantom.csv'):
-        
+                
         #Load the points
         phantomPoints = pd.read_csv('phantom.csv')
         
-        #Fit circle to phantom bead
-        _, _, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
-                                        phantomPoints['Y'].to_numpy())
+        #Calculate scaling factor based on phantom type
+        if phantomType_SP == 'sphere':
         
+            #Fit circle to phantom bead
+            _, _, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
+                                            phantomPoints['Y'].to_numpy())
+            
+        elif phantomType_SP == 'toroid':
+            
+            #Calculate the distance between the points for toroid diameter
+            #Halve to get a radius
+            phantomRadius = np.sqrt((phantomPoints['X'].to_numpy()[0]-phantomPoints['X'].to_numpy()[1])**2+(phantomPoints['Y'].to_numpy()[0]-phantomPoints['Y'].to_numpy()[1])**2) / 2
+            
         #Add to scaling size list            
-        phantomScaleAll.append(phantomRadius / (phantomDiameter/2))
+        phantomScaleAll.append(phantomRadius / (phantomDiameter_SP/2))
         
     #Return to home directory
     os.chdir('..')
@@ -1013,20 +1087,29 @@ for currDir in dirList_TP:
         #Load the points
         phantomPoints = pd.read_csv('phantom.csv')
         
-        #Fit circle to phantom bead
-        _, _, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
-                                        phantomPoints['Y'].to_numpy())
+        #Calculate scaling factor based on phantom type
+        if phantomType_TP == 'sphere':
         
+            #Fit circle to phantom bead
+            _, _, phantomRadius = fitCircle(phantomPoints['X'].to_numpy(),
+                                            phantomPoints['Y'].to_numpy())
+            
+        elif phantomType_TP == 'toroid':
+            
+            #Calculate the distance between the points for toroid diameter
+            #Halve to get a radius
+            phantomRadius = np.sqrt((phantomPoints['X'].to_numpy()[0]-phantomPoints['X'].to_numpy()[1])**2+(phantomPoints['Y'].to_numpy()[0]-phantomPoints['Y'].to_numpy()[1])**2) / 2
+            
         #Add to scaling size list            
-        phantomScaleAll.append(phantomRadius / (phantomDiameter/2))
-        
+        phantomScaleAll.append(phantomRadius / (phantomDiameter_TP/2))
+
     #Return to home directory
     os.chdir('..')
     
 #Take average scale size to apply
 #Print mean and SD to check consistency
 phantomScale_TP = np.mean(phantomScaleAll)
-print(f'Scapular plane phantom scale: {np.round(phantomScale_TP,2)} \u00B1 {np.round(np.std(phantomScaleAll),2)}')    
+print(f'Transverse plane phantom scale: {np.round(phantomScale_TP,2)} \u00B1 {np.round(np.std(phantomScaleAll),2)}')    
 
 # %% Perform calculations
 
@@ -1148,7 +1231,7 @@ for currDir in dirList:
                         break
             elif 'TP' in currPlaneName:
                 #Search through scapular plane dictionary
-                for checkDir in glenoidDefCond_SP.keys():
+                for checkDir in glenoidDefCond_TP.keys():
                     if currDir in glenoidDefCond_TP[checkDir]:
                         #Set the reference directory to current option
                         refDir = checkDir
@@ -1204,7 +1287,12 @@ for currDir in dirList:
             
             #Print out residual error to folder for reference
             with open('glenoidPlaneFit_resErr.txt', 'w') as f:
-                f.write('%f' % resErr)
+                if 'SP' in currPlaneName:
+                    val = resErr / phantomScale_SP
+                    f.write('%f' % val)
+                elif 'TP' in currPlaneName:
+                    val = resErr / phantomScale_TP
+                    f.write('%f' % val)
             f.close()
 
         # %% Calculate moment arms
@@ -1233,6 +1321,114 @@ for currDir in dirList:
     #Navigate back up to data directory
     os.chdir('..')
 
-# %% -----
-
+# %% Review glenoid fitting
     
+# #This section should be run in isolation as it places the esimated glenoid plane
+# #images in a 'temp' folder to review, and also prints out the residual error from
+# #the fitting process.
+
+# #Create folder to store temp images in
+# os.mkdir('tmp')
+# tmpDir = os.getcwd()+'\\tmp\\'
+
+# #Print headline for residual errors
+# print('Residual error values from fitted images:\n')
+
+# #Loop through directories
+# for currDir in dirList:
+    
+#     #Navigate to current directory
+#     os.chdir(currDir)
+    
+#     #Search for the presence of residual glenoid fit data
+#     if not glob('glenoidPlaneFit_resErr.txt'):
+#         #Set to not analyse this folder
+#         fitDir = False
+#     else:
+#         fitDir = True
+        
+#     #Run calculations if data is available
+#     if fitDir:
+        
+#         #Load the text file and extract the value
+#         with open('glenoidPlaneFit_resErr.txt', 'r') as f:
+#             val = f.read()
+#             print(currDir.split('\\')[-2]+': '+val)
+#         f.close()
+        
+#         #Copy the image file to the temp directory
+#         copy2(os.getcwd()+'\\estimatedGlenoidPlaneFit.png', tmpDir)
+        
+#         #Rename file to avoid overwrite errors
+#         os.rename(tmpDir+'estimatedGlenoidPlaneFit.png',
+#                   tmpDir+currDir.split('\\')[-2]+'.png')
+        
+#     #Return up to main directory
+#     os.chdir('..')
+    
+# #There's the opportunity to pause here now and review the images transferred to
+# #the temp directory to see how well the glenoid plane has been fitted, alongside
+# #the printed out values in reviewing the effectiveness of the process
+    
+# %% Clean-up after reviewing glenoid fitting
+
+# #Delete the temp folder
+# rmtree('tmp', ignore_errors = True)
+
+# %% Investigate humeral head size as a consistency reference
+
+# #Look through each analysed folder and calculate humeral head size
+
+# #Print headline for residual errors
+# print('Humeral head size from digitised images:\n')
+
+# #Spot to store values to calculate mean and SD at the end
+# hhDiameters_SP = []
+# hhDiameters_TP = []
+
+# #Loop through directories
+# for currDir in dirList:
+    
+#     #Navigate to current directory
+#     os.chdir(currDir)
+    
+#     #Search for the presence of residual glenoid fit data
+#     if not glob('hh.csv'):
+#         #Set to not analyse this folder
+#         analyseDir = False
+#     else:
+#         analyseDir = True
+        
+#     #Run calculations if data is available
+#     if analyseDir:
+        
+#         #Load humeral head points
+#         hhPoints = pd.read_csv('hh.csv')
+        
+#         #Fit circle to humeral head
+#         hhCentreX, hhCentreY, hhRadius = fitCircle(hhPoints['X'].to_numpy(),
+#                                                     hhPoints['Y'].to_numpy())
+        
+#         #Get plane for scaling
+#         currPlane = []
+#         for plane in planeNames:
+#             if re.search(plane, currDir.split('\\')[-2]):
+#                 #Set the current position to this label
+#                 currPlane.append(plane)
+        
+#         #Print out value for current image
+#         if 'SP' in currPlane[0]:
+#             print(currDir.split('\\')[-2]+': '+str(np.round(hhRadius*2/phantomScale_SP)))
+#             hhDiameters_SP.append(hhRadius*2/phantomScale_SP)
+#         elif 'TP' in currPlane[0]:
+#             print(currDir.split('\\')[-2]+': '+str(np.round(hhRadius*2/phantomScale_TP)))
+#             hhDiameters_TP.append(hhRadius*2/phantomScale_TP)
+
+#     #Return to data directory
+#     os.chdir('..')
+
+# #Print summary values
+# print(f'Humeral head size for scapular plane: {np.round(np.mean(hhDiameters_SP),2)} \u00B1 {np.round(np.std(hhDiameters_SP),2)}')
+# print(f'Humeral head size for transverse plane: {np.round(np.mean(hhDiameters_TP),2)} \u00B1 {np.round(np.std(hhDiameters_TP),2)}')
+
+# %% -----
