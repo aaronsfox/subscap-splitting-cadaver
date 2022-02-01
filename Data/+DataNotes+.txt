@@ -32,8 +32,9 @@ S6
 - Slightly strange upper SS lines on early SP images - adduction moment arm?
 - SP images don't really indicate the SS 'kink' as in other specimen
 - ***** Ex Fix and screws seem to move from 0 to 90 abd,  redefined GP and pts at 90abd 
-- ***** Phantom out of image in ABER 0N & 40N SP, APP 0N & 40N SP --- need to use other?
+- ***** Phantom out of image in ABER 0N, 20N & 40N SP, APP 0N, 20N & 40N SP --- need to use other?
 - ***** Phantom could only get an estimate in 0abd 40N TP, ABER 0N TP, ABER 40N TP, APP 0N TP
+- ***** Phantom missing on more than the above ---- what's the solution? Ratio like below? Need to digitise mini phantom?
 - Glenoid plane hard to identify on transverse images
 - Looks like some posterior translation on transverse images
 
@@ -54,7 +55,7 @@ S2 - 0abd 0N SP; 90abd 40N TP [almost impossible to identify glenoid plane in TP
 S3 - 90abd 0N SP; 90abd 0N TP
 S4 - 0abd 0N SP; 90abd 0N TP
 S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note]
-S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 40N SP +++ APP 0N SP
+S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 20N SP +++ ABER 40N SP +++ APP 0N SP
 S7 - 0abd 0N TP; all in SP as poor points available for registration/too much movement
 
 
@@ -76,12 +77,12 @@ S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 
 *DIGITISED*
 *Below only for 50% split*
-- S1 0N and 40N, SP and TP for every position
-- S2 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP (~30 mins for SP analysis; ~60 mins for TP analysis)
-- S3 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S6 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
+- S1 0N and 40N, SP and TP for every position (20N SP & TP for 0abd, 90abd, ABER, APP) *done for 50%
+- S2 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 20N APP for SP] *done for 50%
+- S3 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
+- S4 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
+- S5 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
+- S6 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
 - S7 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP]
 
 
@@ -94,3 +95,11 @@ S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 - S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S6 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
 - S7 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP]
+
+*DOWNLOAD LINKS*
+- S1 = https://drive.google.com/file/d/1VLKyEkgHoHZ-dg8y4Qvmr7OMiwPU6m_e/view?usp=sharing
+- S2 = https://drive.google.com/file/d/19y5fVNQEPB2UuxoXKm1PFKydW4UOr13p/view?usp=sharing
+- S3 = https://drive.google.com/file/d/1b8vb_i3v1x-0u_okKwlYyo3ek9L_chbP/view?usp=sharing
+- S4,5,6,7 = https://drive.google.com/file/d/1AzoukrWuHeCaQ97cqOBFWW2dZEJXDO8y/view?usp=sharing
+- S8 = ???
+- S9 = https://drive.google.com/file/d/1HRPyhSs4utZaaGSPCc8aUfB8ymZRJTaE/view?usp=sharing
