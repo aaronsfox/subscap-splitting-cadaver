@@ -9,7 +9,7 @@ Created on Mon Aug  2 15:14:21 2021
     aaron.f@deakin.edu.au
     
     This code is used to compile the moment arm and line of action data calculated
-    from individual speciment to summarise the group data. The settings are used
+    from individual specimen to summarise the group data. The settings are used
     to extract the data from the analysed specimen and conditions. This should be
     run from the 'Code' folder.     
     
@@ -470,6 +470,24 @@ plt.tight_layout()
 fig.savefig('..\\Results\\Figures\\ANZORSfigure.png', dpi = 300, format = 'png')
 
 
+# %%
+
+# %% Displaysome basic mean/SD parameters
+
+#Each region for X abduction in X plane with X load
+currPos = 'abd90'
+currPlane = 'TP'
+currLoad = '40N'
+for subscap in subscapNames:
+    mu = np.median(groupData.loc[(groupData['region'] == subscap) &
+                               (groupData['plane'] == currPlane) &
+                               (groupData['position'] == currPos) &
+                               (groupData['load'] == currLoad),['lineOfAction']].to_numpy())
+    sigma25,sigma75 = np.percentile(groupData.loc[(groupData['region'] == subscap) &
+                                                     (groupData['plane'] == currPlane) &
+                                                     (groupData['position'] == currPos) &
+                                                     (groupData['load'] == currLoad),['lineOfAction']].to_numpy(), [25,75])
+    print(f'{currPlane}.{subscap}_{currPos}_{currLoad} = [{mu},{sigma25},{sigma75}];')
 
 # %%
                         
