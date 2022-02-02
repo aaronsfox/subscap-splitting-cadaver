@@ -1,0 +1,1 @@
+ONe line became loose (line 3) and was not in image (i.e. at 40N conjoint tendon load), but it was deemed un-important for this data angle and load, and can most likely be assumed to be the same as 30N of conjoint load at the same angle

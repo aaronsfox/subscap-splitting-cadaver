@@ -47,6 +47,11 @@ S7
 - Some serious posterior translation in ABER and APP in TP
 - Worked out mini sphere size based on its size relative to larger sphere in corresponding images to set TP phantom
 
+S9
+- Bit of movement in camera from initial 0abd 0N to 20N, re-did GP
+- Significant rotation of field of view in 90 abduction --- might this cause issues with analysis calculations as it's not the same orientation as others in SP? Was consistent with this field of view from 90abd onwards
+- Not easy to identify glenoid plane in TP images
+
 
 
 *GP*
@@ -57,6 +62,7 @@ S4 - 0abd 0N SP; 90abd 0N TP
 S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note]
 S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 20N SP +++ ABER 40N SP +++ APP 0N SP
 S7 - 0abd 0N TP; all in SP as poor points available for registration/too much movement
+S9 - 0abd 0N SP +++ 0abd 20N SP +++ 90abd 0N SP; 0abd 0N TP [check on APP 40N TP when processing - should be a good match to check as it was somewhat better visibility]
 
 
 
@@ -68,6 +74,7 @@ S4 - not completely spherical bead of 6.5mm diameter [both SP & TP]
 S5 - perfect sphere of 7.93mm diameter [both SP & TP]
 S6 - perfect sphere of 7.93mm diameter [both SP & TP]
 S7 - perfect sphere of 7.93mm diameter [SP] / mini sphere of 2.45 in diameter [TP]
+S9 - perfect sphere of 7.93mm diameter [both SP & TP]
 
 
 *LINES*
@@ -83,7 +90,8 @@ S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 - S4 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
 - S5 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
 - S6 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
-- S7 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP]
+- S7 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP] *done for 50%
+- S9 0N, 20N and 40N, SP and TP for 0abd, 90abd, ABER, APP *done for 50%
 
 
 *PROCESSED*
