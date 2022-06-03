@@ -1,0 +1,369 @@
+---
+title: Does subscapularis splitting technique during the Latarjet procedure matter? Muscle moment arms and lines of action in a cadaveric model
+author:
+  - name: Aaron S. Fox
+    affiliation: Centre for Sports Research,Barwon Centre for Orthopaedic Research and Education (B-CORE)
+    footnote: 1
+  - name: Richard S. Page
+    affiliation: Barwon Centre for Orthopaedic Research and Education (B-CORE),School of Medicine,Orthopaedic Department
+  - name: Janina Henze
+    affiliation: TODO
+  - name: Lukas Ernstbrunner
+    affiliation: Department of Orthopaedic Surgery
+  - name: David C. Ackland
+    affiliation: Department of Biomedical Engineering
+address:
+  - code: Centre for Sports Research
+    address: Centre for Sports Research, School of Exercise and Nutrition Sciences, Deakin University, Geelong, Australia
+  - code: Barwon Centre for Orthopaedic Research and Education (B-CORE)
+    address: Barwon Centre for Orthopaedic Research and Education (B-CORE), Barwon Health, St John of Jod Hospital and Deakin University, Geelong, Australia
+  - code: School of Medicine
+    address: School of Medicine, Deakin University, Geelong, Australia
+  - code: Orthopaedic Department
+    address: Orthopaedic Department, University Hospital Geelong, Barwon Health, Geelong, Australia
+  - code: Department of Orthopaedic Surgery
+    address: Department of Orthopaedic Surgery, University Hospital Balgrist, Zurich, Switzerland
+  - code: Department of Biomedical Engineering
+    address: Department of Biomedical Engineering, University of Melbourne, Parkville, Australia
+footnote:
+  - code: 1
+    text: "Corresponding Author: aaron.f@deakin.edu.au"
+abstract: |
+  TODO: Add abstract...
+
+journal: BioR$\chi$iv
+date: "Version 1.0; Last Updated:`r Sys.Date()`"
+bibliography: mybibfile.bib
+#linenumbers: true
+numbersections: true
+csl: elsevier-harvard.csl
+geometry: margin=1in
+#TODO: add word doc output/template
+output: rticles::elsevier_article
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+
+#Multiple knit options - in YAML
+# knit: (function(inputFile, encoding) {
+#   rmarkdown::render(inputFile, encoding = encoding,
+#   output_format = "all") })
+
+```
+
+``` {r loadLibraries, include = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+
+#Load necessary libraries
+library(dplyr)
+library(here)
+library(ggplot2)
+library(ggpubr)
+library(rstatix)
+
+```
+
+``` {r setupPython}
+
+#Load reticulate library for python usage
+library(reticulate)
+
+#Set conda base environment as the python set-up
+use_condaenv(condaenv = "C:\\Users\\aafox\\Miniconda3")
+
+#Set system version of python to use (not required)
+# use_python("C:\\Users\\aafox\\AppData\\Local\\Programs\\Python\\Python37", required = T)
+#sys <- import("sys")
+#sys$version #checks version
+
+```
+
+# Introduction
+
+***TODO: copy across a lot of this to multiple split paper...***
+
+Shoulder instability injuries occur with excessive force that translates the humeral head out of the glenohumeral joint socket [@Thangarajah2016], and are a concerning problem affecting young athletes in overhead collision sports (e.g. Australian football, rugby) [@Bohu2015,@Orchard2013]. Effective clinical care is vital to avoid recurrent injuries, as well as reduced shoulder function and joint degradation [@Thangarajah2016]. Surgery is often needed to address pathology, restore function and correct stability [@Kavaja2012]. The Latarjet procedure is a non-anatomic, open shoulder reconstruction involving a bone block via transfer of the coracoid process to the anterior glenoid with the attached conjoint tendon [@Latarjet1954]. The Latarjet procedure is commonly used in cases with significant glenoid bone loss, large humerus compression fractures, or glenoid and humeral bone defects [@Millett2005] — and is effective in combatting recurrent anterior instability injury [@Bonacci2018,@Bessiere2014]. Latarjet procedures are also emerging as the preferred option for surgical shoulder stabilisation, especially in contact sport settings [@Millett2005,@Bonazza2017]. 
+
+The Latarjet procedure requires high precision, and subtle variations in surgical technique may impact the likelihood of degenerative changes and subsequent injury [@Bhatia2014,@Ghodadra2010]. An important choice in the Latarjet procedure is the treatment of the subscapularis muscle [@Bhatia2014]. The subscapularis muscle must be manipulated to access the anterior portion of the glenohumeral joint and place the coracoid bone graft. Early iterations of the Latarjet procedure completely dissected the subscapularis tendon and reflected the muscle to expose the anterior joint capsule. Complete release of the subscapularis during surgery can elevate the risk of future tears to the tendon [@Lazarus2000]. Further, the subscapularis is a strong anterior stabiliser of the joint [@Lee2000] and therefore maintaining its integrity is relevant to joint stability. Subsequently, the current recommended approach [@Bhatia2014] is to use a horizontal split through the muscle fibres (i.e. a subscapularis split). Using the subscapularis split approach, the final position of the conjoint tendon passes through the split, adding tension to the inferior portion in extreme degrees of abduction and/or external rotation [@Yamamoto2013]. This added tension in the subscapularis enhances anterior and inferior joint stability [@Yamamoto2013].
+
+Although a subscapularis splitting approach for the Latarjet procedure is advocated, variable techniques for the location of the split are reported [@Bhatia2014,@Burkhart2007,@Allain1998,@Shah2012]. This includes splitting the subscapularis at: (i) the junction of its superior and middle thirds (i.e. one-third from the top) [@Burkhart2007]; (ii) the junction of its upper two-thirds and lower one-third (i.e. one-third from the bottom) [@Bhatia2014,@Shah2012]; or (iii) along the fibres at the 'middle third' (i.e. mid-point of the muscle) [@Allain1998]. Understanding which split location optimises stability and function is key for providing further guidance around the Latarjet procedure. However, the effect on stability and muscle function for varying split locations has not been extensively tested. Of those studies which have investigated the stabilising mechanisms of the Latarjet procedure [@Yamamoto2013,@Giles2013,@Wellmann2012] — the majority have used a split at the upper two and lower one-thirds of the muscle [@Yamamoto2013,@Wellmann2012]; while one did not report the location [@Giles2013]. There is a clear gap in understanding how variable subscapularis split locations furing the Latarjet procedure impacts its mechanical stabilising effect. Further, none of the aforemention mechanistic studies [@Yamamoto2013,@Giles2013,@Wellmann2012] have examined muscle anatomy and function. The Latarjet procedure and splitting technique used will have a substantial effect on subscapularis muscle moment arms and lines of action. The moment arm of a muscle largely determines its role as a stabiliser and prime mover [@Ackland2008]. A muscle's line of action dictates the direction in which it produces force [@Ackland2009]. Muscles whose line of action produces predominantly compressive forces stabilise the shoulder, while those that produce predominantly shear forces may help cause instability [@Ackland2003]. Understanding how subscapularis splitting alters the moment arms and lines of action of the subscapularis can reveal further information about this muscles contribution to shoulder joint stability folowing the Latarjet procedure. Assessing the various splitting techniques may also provide support for an optimal method.
+
+This study examines how varying subscapularis splitting techniques within the Latarjet procedure impacts subscapularis muscle function and the potential for shoulder joint (in)stability. First, the moment arms and lines of action of subscapularis muscle sub-regions across various glenohumeral joint positions under different subscapularis splitting techniques are examined. Second, these data are used to assess the potential contributions of the subscapularis muscle sub-regions to glenohumeral joint stability under the different subscapularis splitting techniques.
+
+# Methods
+
+## Specimen Preparation
+
+Eight (***X male, X female; ...enter participant details***) fresh-frozen, entire upper extremities were obtained from human cadavera. Ethics approval for the use of specimen in this study was obtained from the ***Health Sciences Human Ethics Sub-Committee, University of Melbourne***. All specimens were arthroscopically screened to ensure they were free of degenerative changes such as osteoarthritis, rotator cuff tears and significant joint contracture. Specimens were thawed at room temperature 24 hours prior to dissecting and testing. 
+
+**TODO: add details about specimen preparation...**
+
+**TODO: include details from Janina re: Latarjet procedures...**
+
+
+
+## Experimental Protocol
+
+**...**
+
+
+
+Nylon lines were attached to the suture of each proximal tendon of the subscapularis regions and passed through a perforate plate to a free hanging weight of ***...insert load...***. This maintained muscle-tendon unit tension while minimising load induced muscle-tendon lengthening, and assisted in producing joint congruency during testing. Each tendon unit was pulled toward the centroid of its proximal origin, thus reproducing the approximate line of action of the muscle-tendon region.
+
+
+The moment arms and line of action for each sub-region of the subscapularis muscle were calculated across a series of static positions. The humerus was passively held at zero and 90 degrees of elevation in the scapular plane, as well as at full external rotation while at 90 degrees of scapular elevation (i.e. ABER position). An additional position of 'apprehension' was tested where the arm was placed in the ABER position with the humerus horizontally abducted to a point just prior to dislocation.
+
+Specimens were radiographed using X-ray fluoroscopy from scapula and transverse plane views at each joint position (Fluoroscan InSight 2, Hologic Inc., Bedford, MA), and each muscle subregions line of action was calculated from its wire orientation with respect to the glenoid plane. A muscle subregions line of action was defined from the directional cosines of the vector formed between the most proximal tendon wrapping 'via point' (i.e. where the tendon loses contact with the hmerus) and the centroid of the tendon origin [@Ackland2019]. 
+
+**TODO: add line of action calculations...**
+
+For each muscle subregion, average stability ratios were computed to assess the muscle's potential contributions to anterior/posterior and superior/inferior glenohumeral joint stability across the tested positions. Average anterior and superior stability ratios were calculated by dividing the average anterior/posterior and superior/inferior shear components of a muscle subregions line of action, respectively, by the average magnitude of its compressive component:
+
+$$R_{A} = \frac{f_{y}}{|f_{x}|}; R_{S} = \frac{f_{z}}{|f_{x}|}$$
+where $R_{A}$ and $R_{S}$ are the anterior and superior stability ratios, respectively; $f_{x}$, $f_{y}$ and $f_{z}$ are the directional cosines of the vectors used to calculate the line of action in the scapular reference frame [@ACkland2009]. Where a muscle subregions stability ratio was greater than one it was considered as having destabilising potential, as the shear component of the line of action was larger than the compressive component [@Ackland2009]. Conversely, where muscle subregions stability ratio was less than one it was considered as having stabilising potential, as the shear component of its line of action was smaller than the compressive component [@Ackland2009]. A positive versus negative anterior stability ratio represented a muscle subregion with an anterior versus posterior shear component, respectively; while a positive versus negative superior stability ratio represented a muscle subregion with a superior versus inferior shear component, respectively [@Ackland2009]. 
+
+Calculations were made for each specimen across the ***three*** subscapularis muscle split configurations.
+
+
+## Statistical Analyses
+
+We used a three-way (i.e. subscapularis region x arm position x conjoined tendon load) repeated measures analysis of variance (ANOVA) to examine the effect of these independent variables on the dependent variables of line of action and moment arm in both the scapular and transverse plane. Main and interaction effects across the independent variables were explored — however, given our primary focus was to explore the dynamic sling mechanism (i.e. conjoined tendon loading) associated with the Latarjet procedure, post-hoc analyses were only planned where conjoined tendon load was identified as a statistically significant main and/or interaction effect. Where statistically significant effects were identified — three-way interaction, two-way interaction and main effects were followed up with two-way, one-way and pairwise comparisons, respectively. Statistical significance across all tests was set at an alpha level of 0.05, with a Benjamini-Hochberg correction for multiple comparisons applied.
+
+# Results
+
+**TODO: add results**
+
+``` {r importResults, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+
+#### TODO: mixed or 3 x RM ANOVA instead of fixed/random effects model...?
+
+#Import group dataset
+data <- read.csv(file = paste(here::here(),"/Results/Processed/groupData.csv", sep = ""),
+                 stringsAsFactors = TRUE)
+
+#Get summary stats
+data %>%
+  group_by(plane, region, position, load) %>%
+  get_summary_stats(lineOfAction, type = "mean_sd") %>%
+  View()
+
+#Normality
+data %>%
+  group_by(plane, region, position, load) %>%
+  shapiro_test(lineOfAction)
+
+# #Create QQ-plot for normality check
+# ggqqplot(data, "lineOfAction", ggtheme = theme_bw()) +
+#   facet_grid(plane + position ~ region + load, labeller = "label_both")
+
+```
+
+***Figure X*** displays the lines of action and corresponding stability ratios of the various subscapularis subregions in the scapula and transverse planes under the three loading conditions (i.e. 0N, 20N, 40N).
+
+## Lines of Action
+
+``` {r loaFig, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+
+#### TODO: display output from python
+
+```
+
+### Scapular Plane
+
+``` {r statAnalysis_loa_SP, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+
+#Run anova
+aov3_loa_SP <- anova_test(data = data %>%
+                            filter(plane == "SP"),
+                          dv = "lineOfAction", wid = specimen,
+                          within = c(region, position, load),
+                          effect.size = "pes"
+                          )
+
+#Review ANOVA table
+get_anova_table(aov3_loa_SP,
+                correction = c("auto")) %>%
+  adjust_pvalue(method = "BH") %>%
+  as_tibble() %>%
+  mutate(p.adj.significance = case_when(
+    p.adj < 0.05 ~ "*",
+    p.adj >= 0.05 ~ "",
+  )) %>%
+  View()
+
+#Post-hoc on two-way interactions
+postHoc2_loa_SP <- data %>%
+  filter(plane == "SP") %>%
+  group_by(region) %>%
+  anova_test(dv = lineOfAction, wid = c(specimen, position), within = c(load),
+             effect.size = "pes")
+
+#Review post-hoc table
+get_anova_table(postHoc2_loa_SP,
+                correction = c("auto")) %>%
+  adjust_pvalue(method = "BH") %>%
+  as_tibble() %>%
+  mutate(p.adj.significance = case_when(
+    p.adj < 0.05 ~ "*",
+    p.adj >= 0.05 ~ "",
+  )) %>%
+  View()
+
+#Posthoc one way effects
+
+#Load on SS3 & SS4
+
+#### Is this accounting for pairwise across other factors appropriately????
+#### Sorting/arranging by specimen/position doesn't change the analysis...
+#### Sorting by line of action does though --- so obviously it pairs by the ordering of the dataframe...
+#### If we sort by specimen & position it should be alignedthen...????
+
+postHoc_load_ss3_loa_SP <- data %>%
+  filter(plane == "SP") %>%
+  filter(region == "ss3") %>%
+  arrange(specimen,position) %>%
+  pairwise_t_test(lineOfAction ~ load, paired = TRUE, detailed = TRUE,
+                  p.adjust.method = "BH") %>%
+  View()
+
+postHoc_load_ss4_loa_SP <- data %>%
+  filter(plane == "SP") %>%
+  filter(region == "ss4") %>%
+  arrange(specimen,position) %>%
+  pairwise_t_test(lineOfAction ~ load, paired = TRUE, detailed = TRUE,
+                  p.adjust.method = "BH") %>%
+  View()
+
+# #Pairwise comparisons for main effects
+# mainRegion_loa_SP <- data %>%
+#   filter(plane == "SP") %>%
+#   pairwise_t_test(lineOfAction ~ region, paired = TRUE,
+#                   p.adjust.method = "BH") %>%
+#   View()
+
+```
+
+Three-way repeated measures ANOVA found statistically significant subscapularis region x arm position () and subscapularis region x conjoined tendon load () interaction effects; and statistically significant subscapularis region() and arm position () main effects on muscle line of action in the scapular plane. The main effect of conjoined tendon load (), and interaction effects of arm position x conjoined tendon load () and subscapularis region x arm position x conjoined tendon load () on line of action in the scapular plane did not reach statistical significance. 
+
+\
+
+Post-hoc analysis of subscapularis region x conjoined tendon load effects found a statistically significant effect of arm position on the lower-middle () and lower () regions of the muscle.
+
+``` {r statAnalysis_loa_TP, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+
+#Run anova
+aov3_loa_TP <- anova_test(data = data %>%
+                            filter(plane == "TP"),
+                          dv = "lineOfAction", wid = specimen,
+                          within = c(region, position, load),
+                          effect.size = "pes"
+                          )
+
+#Review ANOVA table
+get_anova_table(aov3_loa_TP,
+                correction = c("auto")) %>%
+  adjust_pvalue(method = "BH") %>%
+  as_tibble() %>%
+  mutate(p.adj.significance = case_when(
+    p.adj < 0.05 ~ "*",
+    p.adj >= 0.05 ~ "",
+  )) %>%
+  View()
+
+```
+
+
+``` {r statAnalysis_ma_SP, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+
+#Run anova
+aov3_ma_SP <- anova_test(data = data %>%
+                           filter(plane == "SP"),
+                         dv = "momentArm", wid = specimen,
+                         within = c(region, position, load),
+                         effect.size = "pes"
+                         )
+
+#Review ANOVA table
+get_anova_table(aov3_ma_SP,
+                correction = c("auto")) %>%
+  adjust_pvalue(method = "BH") %>%
+  as_tibble() %>%
+  mutate(p.adj.significance = case_when(
+    p.adj < 0.05 ~ "*",
+    p.adj >= 0.05 ~ "",
+  )) %>%
+  View()
+
+```
+
+
+
+``` {r statAnalysis_ma_TP, include = TRUE, echo = FALSE, warning = FALSE, message = FALSE}
+
+#Run anova
+aov3_ma_TP <- anova_test(data = data %>%
+                           filter(plane == "TP"),
+                         dv = "momentArm", wid = specimen,
+                         within = c(region, position, load),
+                         effect.size = "pes"
+                         )
+
+#Review ANOVA table
+get_anova_table(aov3_ma_TP,
+                correction = c("auto")) %>%
+  adjust_pvalue(method = "BH") %>%
+  as_tibble() %>%
+  mutate(p.adj.significance = case_when(
+    p.adj < 0.05 ~ "*",
+    p.adj >= 0.05 ~ "",
+  )) %>%
+  View()
+
+```
+
+
+# Discussion
+
+**TODO: add discussion**
+
+Main and interaction effects of subscapularis region and arm position were identified. Given our focus on the effect of conjoined tendon load in post-hoc analyses, we did not deduce the specific effects of subscapularis region and arm position on muscle lines of action and moment arms --- however our data noting that these variables can have an effect on lines of action and muscle moment arms is in line with existing work...i.e. Ackland papers have demonstrated that subscapularis anatomy and function difers across regions and in different arm positions, which our data also suggests occurs...Existing studies have demonstrated the anatomical and functional differences of the subscapularis muscle region, and the simple anatomy and orientation of the subscapularis muscle, indicative of varying lines of action and moment arms across the muscle regions...despite not inspecting the maine ffects of muscle region and arm position furhter in our study --- our results suggest these same trends remain following the Latarjet procedure...
+
+
+The impact of conjoined tendon load, and the subsequent dynamic sling mechanism, was predominantly observed in the lower regions of the subscapularis muscle. This is not surprising as these portion of the muscle undergoes the most manipulation or re-routing with respect to the coracoid bone block and conjoined tendon. This was visually clear in the majority of our images even without conjoined tendon loading (see image Figure...), demonstrating that there are likely passive alterations to the lower subscapularis muscle anatomy and function following the Latarjet --- comparison to existing data??? The proposed mechanism of the dynamic sling relates to repositioning of the lower regions of the subscapularis underneath the conjoined tendon, and hence when loaded...was this what we observed?
+
+This focused/isolated effect on the lower regions of subscapularis may have some potential to be altered with varying Latarjet technique. Within our study we performed the Latarjet with a mid-belly split of the subscpularis muscle...whereas there are techniques that perform this split at higher vs. lower levels...it makes sense that the portions of the subscpaularis that require/are re-routed around the coracoid bone block would change the muscle regions lines of action and potentially alter the impact of conjoined tendon loading on the various regions...we aim to examine these technical variations with further experiments in line with the methods of this study...
+
+
+Was there variability in the effect of conjoined tendon loading? This could be the case where certain specimen didn't have an obvious shift in potential subscapularis lines of action --- but this became more obvious with the conjoined tendon loading (see an image; i.e. larger effect of conjoined tendon loading)...?
+
+
+# Conclusions
+
+**TODO: add conclusions**
+
+
+
+
+```{python, eval=TRUE, echo=TRUE}
+
+#Basic print command
+print('Using python in R!')
+
+#Import pandas
+import pandas as pd
+
+#Import seaborn and load dataset
+import seaborn as sns
+iris = sns.load_dataset('iris')
+iris.head()
+
+```
+
+
+
+
+
+References {#references .unnumbered}
+==========
+

@@ -1,0 +1,418 @@
+\documentclass[]{elsarticle} %review=doublespace preprint=single 5p=2 column
+%%% Begin My package additions %%%%%%%%%%%%%%%%%%%
+\usepackage[hyphens]{url}
+
+  \journal{BioR\(\chi\)iv} % Sets Journal name
+
+
+\usepackage{lineno} % add
+
+\usepackage{graphicx}
+%%%%%%%%%%%%%%%% end my additions to header
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \usepackage{fontspec}
+  \ifxetex
+    \usepackage{xltxtra,xunicode}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use microtype if available
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+\usepackage[margin=1in]{geometry}
+\bibliographystyle{elsarticle-harv}
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={},
+            pdftitle={Does subscapularis splitting technique during the Latarjet procedure matter? Muscle moment arms and lines of action in a cadaveric model},
+            colorlinks=false,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+\urlstyle{same}  % don't use monospace font for urls
+
+\setcounter{secnumdepth}{5}
+% Pandoc toggle for numbering sections (defaults to be off)
+
+% Pandoc syntax highlighting
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+
+% tightlist command for lists without linebreak
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+
+
+
+\begin{document}
+
+
+\begin{frontmatter}
+
+  \title{Does subscapularis splitting technique during the Latarjet
+procedure matter? Muscle moment arms and lines of action in a cadaveric
+model}
+    \author[Centre for Sports Research,Barwon Centre for Orthopaedic
+Research and Education (B-CORE)]{Aaron S. Fox\corref{1}}
+  
+    \author[Barwon Centre for Orthopaedic Research and Education
+(B-CORE),School of Medicine,Orthopaedic Department]{Richard S. Page}
+  
+    \author[TODO]{Janina Henze}
+  
+    \author[Department of Orthopaedic Surgery]{Lukas Ernstbrunner}
+  
+    \author[Department of Biomedical Engineering]{David C. Ackland}
+  
+      \address[Centre for Sports Research]{Centre for Sports Research,
+School of Exercise and Nutrition Sciences, Deakin University, Geelong,
+Australia}
+    \address[Barwon Centre for Orthopaedic Research and Education
+(B-CORE)]{Barwon Centre for Orthopaedic Research and Education (B-CORE),
+Barwon Health, St John of Jod Hospital and Deakin University, Geelong,
+Australia}
+    \address[School of Medicine]{School of Medicine, Deakin University,
+Geelong, Australia}
+    \address[Orthopaedic Department]{Orthopaedic Department, University
+Hospital Geelong, Barwon Health, Geelong, Australia}
+    \address[Department of Orthopaedic Surgery]{Department of
+Orthopaedic Surgery, University Hospital Balgrist, Zurich, Switzerland}
+    \address[Department of Biomedical Engineering]{Department of
+Biomedical Engineering, University of Melbourne, Parkville, Australia}
+      \cortext[1]{Corresponding Author: aaron.f@deakin.edu.au}
+  
+  \begin{abstract}
+  TODO: Add abstract\ldots{}
+  \end{abstract}
+  
+ \end{frontmatter}
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+\textbf{\emph{TODO: copy across a lot of this to multiple split
+paper\ldots{}}}
+
+Shoulder instability injuries occur with excessive force that translates
+the humeral head out of the glenohumeral joint socket
+(\textbf{Thangarajah2016?}), and are a concerning problem affecting
+young athletes in overhead collision sports (e.g.~Australian football,
+rugby) (\textbf{Orchard2013?}). Effective clinical care is vital to
+avoid recurrent injuries, as well as reduced shoulder function and joint
+degradation (\textbf{Thangarajah2016?}). Surgery is often needed to
+address pathology, restore function and correct stability
+(\textbf{Kavaja2012?}). The Latarjet procedure is a non-anatomic, open
+shoulder reconstruction involving a bone block via transfer of the
+coracoid process to the anterior glenoid with the attached conjoint
+tendon (\textbf{Latarjet1954?}). The Latarjet procedure is commonly used
+in cases with significant glenoid bone loss, large humerus compression
+fractures, or glenoid and humeral bone defects (\textbf{Millett2005?})
+--- and is effective in combatting recurrent anterior instability injury
+(\textbf{Bessiere2014?}). Latarjet procedures are also emerging as the
+preferred option for surgical shoulder stabilisation, especially in
+contact sport settings (\textbf{Bonazza2017?}).
+
+The Latarjet procedure requires high precision, and subtle variations in
+surgical technique may impact the likelihood of degenerative changes and
+subsequent injury (\textbf{Ghodadra2010?}). An important choice in the
+Latarjet procedure is the treatment of the subscapularis muscle
+(\textbf{Bhatia2014?}). The subscapularis muscle must be manipulated to
+access the anterior portion of the glenohumeral joint and place the
+coracoid bone graft. Early iterations of the Latarjet procedure
+completely dissected the subscapularis tendon and reflected the muscle
+to expose the anterior joint capsule. Complete release of the
+subscapularis during surgery can elevate the risk of future tears to the
+tendon (\textbf{Lazarus2000?}). Further, the subscapularis is a strong
+anterior stabiliser of the joint (\textbf{Lee2000?}) and therefore
+maintaining its integrity is relevant to joint stability. Subsequently,
+the current recommended approach (\textbf{Bhatia2014?}) is to use a
+horizontal split through the muscle fibres (i.e.~a subscapularis split).
+Using the subscapularis split approach, the final position of the
+conjoint tendon passes through the split, adding tension to the inferior
+portion in extreme degrees of abduction and/or external rotation
+(\textbf{Yamamoto2013?}). This added tension in the subscapularis
+enhances anterior and inferior joint stability (\textbf{Yamamoto2013?}).
+
+Although a subscapularis splitting approach for the Latarjet procedure
+is advocated, variable techniques for the location of the split are
+reported (\textbf{Shah2012?}). This includes splitting the subscapularis
+at: (i) the junction of its superior and middle thirds (i.e.~one-third
+from the top) (\textbf{Burkhart2007?}); (ii) the junction of its upper
+two-thirds and lower one-third (i.e.~one-third from the bottom)
+(\textbf{Shah2012?}); or (iii) along the fibres at the `middle third'
+(i.e.~mid-point of the muscle) (\textbf{Allain1998?}). Understanding
+which split location optimises stability and function is key for
+providing further guidance around the Latarjet procedure. However, the
+effect on stability and muscle function for varying split locations has
+not been extensively tested. Of those studies which have investigated
+the stabilising mechanisms of the Latarjet procedure
+(\textbf{Wellmann2012?}) --- the majority have used a split at the upper
+two and lower one-thirds of the muscle (\textbf{Wellmann2012?}); while
+one did not report the location (\textbf{Giles2013?}). There is a clear
+gap in understanding how variable subscapularis split locations furing
+the Latarjet procedure impacts its mechanical stabilising effect.
+Further, none of the aforemention mechanistic studies
+(\textbf{Wellmann2012?}) have examined muscle anatomy and function. The
+Latarjet procedure and splitting technique used will have a substantial
+effect on subscapularis muscle moment arms and lines of action. The
+moment arm of a muscle largely determines its role as a stabiliser and
+prime mover (\textbf{Ackland2008?}). A muscle's line of action dictates
+the direction in which it produces force (\textbf{Ackland2009?}).
+Muscles whose line of action produces predominantly compressive forces
+stabilise the shoulder, while those that produce predominantly shear
+forces may help cause instability (\textbf{Ackland2003?}). Understanding
+how subscapularis splitting alters the moment arms and lines of action
+of the subscapularis can reveal further information about this muscles
+contribution to shoulder joint stability folowing the Latarjet
+procedure. Assessing the various splitting techniques may also provide
+support for an optimal method.
+
+This study examines how varying subscapularis splitting techniques
+within the Latarjet procedure impacts subscapularis muscle function and
+the potential for shoulder joint (in)stability. First, the moment arms
+and lines of action of subscapularis muscle sub-regions across various
+glenohumeral joint positions under different subscapularis splitting
+techniques are examined. Second, these data are used to assess the
+potential contributions of the subscapularis muscle sub-regions to
+glenohumeral joint stability under the different subscapularis splitting
+techniques.
+
+\hypertarget{methods}{%
+\section{Methods}\label{methods}}
+
+\hypertarget{specimen-preparation}{%
+\subsection{Specimen Preparation}\label{specimen-preparation}}
+
+\textbf{\emph{XXXXX}} (\textbf{\emph{X male, X female; \ldots enter
+participant details}}) fresh-frozen, entire upper extremities were
+obtained from human cadavera. Ethics approval for the use of specimen in
+this study was obtained from the \textbf{\emph{Health Sciences Human
+Ethics Sub-Committee, University of Melbourne}}. All specimens were
+arthroscopically screened to ensure they were free of degenerative
+changes such as osteoarthritis, rotator cuff tears and significant joint
+contracture. Specimens were thawed at room temperature 24 hours prior to
+dissecting and testing.
+
+\textbf{TODO: add details about specimen preparation\ldots{}}
+
+\textbf{TODO: include details from Janina re: Latarjet
+procedures\ldots{}}
+
+\hypertarget{experimental-protocol}{%
+\subsection{Experimental Protocol}\label{experimental-protocol}}
+
+\textbf{\ldots{}}
+
+Nylon lines were attached to the suture of each proximal tendon of the
+subscapularis regions and passed through a perforate plate to a free
+hanging weight of \textbf{\emph{\ldots insert load\ldots{}}}. This
+maintained muscle-tendon unit tension while minimising load induced
+muscle-tendon lengthening, and assisted in producing joint congruency
+during testing. Each tendon unit was pulled toward the centroid of its
+proximal origin, thus reproducing the approximate line of action of the
+muscle-tendon region.
+
+The moment arms and line of action for each sub-region of the
+subscapularis muscle were calculated across a series of static
+positions. The humerus was passively held at \textbf{\emph{\ldots insert
+test angles\ldots{}}} of elevation in the scapular plane, as well as at
+\textbf{\emph{\ldots insert abduction external rotation
+positions\ldots{}}}.
+
+Specimens were radiographed using X-ray fluoroscopy from
+\textbf{\emph{\ldots list the two directions\ldots{}}} at each joint
+position (Fluoroscan InSight 2, Hologic Inc., Bedford, MA), and each
+muscle subregions line of action was calculated from its wire
+orientation with respect to the glenoid plane. A muscle subregions line
+of action was defined from the directional cosines of the vector formed
+between the most proximal tendon wrapping `via point' (i.e.~where the
+tendon loses contact with the hmerus) and the centroid of the tendon
+origin (\textbf{Ackland2019?}).
+
+\textbf{TODO: muscle moment arm calculations\ldots{}}
+
+For each muscle subregion, average stability ratios were computed to
+assess the muscle's potential contributions to anterior/posterior and
+superior/inferior glenhumeral joint stability across the tested
+positions. Average anterior and superior stability ratios were
+calculated by dividing the average anterior/posterior and
+superior/inferior shear components of a muscle subregions line of
+action, respectively, by the average magnitude of its compressive
+component:
+
+\[R_{A} = \frac{f_{y}}{|f_{x}|}; R_{S} = \frac{f_{z}}{|f_{x}|}\] where
+\(R_{A}\) and \(R_{S}\) are the anterior and superior stability ratios,
+respectively; \(f_{x}\), \(f_{y}\) and \(f_{z}\) are the directional
+cosines of the vectors used to calculate the line of action in the
+scapular reference frame (\textbf{ACkland2009?}). Where a muscle
+subregions stability ratio was greater than one it was considered as
+having destabilising potential, as the shear component of the line of
+action was larger than the compressive component
+(\textbf{Ackland2009?}). Conversely, awhere muscle subregions stability
+ratio was less than one it was considered as having stabilising
+potential, as the shear component of its line of action was smaller than
+the compressive component (\textbf{Ackland2009?}). A positive versus
+negative anterior stability ratio represented a muscle subregion with an
+anterior versus posterior shear component, respectively; while a
+positive versus negative superior stability ratio represented a muscle
+subregion with a superior versus inferior shear component, respectively
+(\textbf{Ackland2009?}).
+
+Calculations were made for each specimen across the
+\textbf{\emph{three}} subscapularis muscle split configurations.
+
+We used a mixed effects linear model to examine changes in\ldots line of
+action, moment arms\ldots fixed effects of subscapularis muscle region,
+arm position and load, random effect of specimen\ldots{}
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\textbf{TODO: add results}
+
+\begin{verbatim}
+## # A tibble: 96 x 7
+##    region position load  plane variable     statistic     p
+##    <fct>  <fct>    <fct> <fct> <chr>            <dbl> <dbl>
+##  1 ss1    abd0     0N    SP    lineOfAction     0.924 0.463
+##  2 ss1    abd0     20N   SP    lineOfAction     0.929 0.511
+##  3 ss1    abd0     40N   SP    lineOfAction     0.932 0.534
+##  4 ss1    abd90    0N    SP    lineOfAction     0.924 0.461
+##  5 ss1    abd90    20N   SP    lineOfAction     0.913 0.376
+##  6 ss1    abd90    40N   SP    lineOfAction     0.900 0.290
+##  7 ss1    ABER     0N    SP    lineOfAction     0.960 0.813
+##  8 ss1    ABER     20N   SP    lineOfAction     0.934 0.555
+##  9 ss1    ABER     40N   SP    lineOfAction     0.931 0.526
+## 10 ss1    APP      0N    SP    lineOfAction     0.923 0.451
+## # ... with 86 more rows
+\end{verbatim}
+
+\hypertarget{lines-of-action}{%
+\subsection{Lines of Action}\label{lines-of-action}}
+
+\hypertarget{scapular-plane}{%
+\subsubsection{Scapular Plane}\label{scapular-plane}}
+
+Three-way repeated measures ANOVA found statistically significant
+subscapularis region x arm position () and subscapularis region x
+conjoined tendon load () interaction effects; and statistically
+significant subscapularis region() and arm position () main effects on
+muscle line of action in the scapular plane. The main effect of
+conjoined tendon load (), and interaction effects of arm position x
+conjoined tendon load () and subscapularis region x arm position x
+conjoined tendon load () on line of action in the scapular plane did not
+reach statistical significance.\\
+Post-hoc analysis of subscapularis region x arm position effects found a
+statistically significant effect of arm position on the upper (),
+lower-middle () and lower () regions of the muscle. No statistically
+significant post-hoc effects (adjusted \emph{p} \textgreater{} 0.05)
+were observed for conjoined tendon load on subscapularis region.
+
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
+
+\textbf{TODO: add discussion}
+
+\hypertarget{conclusions}{%
+\section{Conclusions}\label{conclusions}}
+
+\textbf{TODO: add conclusions}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{\#Basic print command}
+\BuiltInTok{print}\NormalTok{(}\StringTok{\textquotesingle{}Using python in R!\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\#Import pandas}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Using python in R!
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+
+\CommentTok{\#Import seaborn and load dataset}
+\ImportTok{import}\NormalTok{ seaborn }\ImportTok{as}\NormalTok{ sns}
+\NormalTok{iris }\OperatorTok{=}\NormalTok{ sns.load\_dataset(}\StringTok{\textquotesingle{}iris\textquotesingle{}}\NormalTok{)}
+\NormalTok{iris.head()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    sepal_length  sepal_width  petal_length  petal_width species
+## 0           5.1          3.5           1.4          0.2  setosa
+## 1           4.9          3.0           1.4          0.2  setosa
+## 2           4.7          3.2           1.3          0.2  setosa
+## 3           4.6          3.1           1.5          0.2  setosa
+## 4           5.0          3.6           1.4          0.2  setosa
+\end{verbatim}
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+
+\end{document}
