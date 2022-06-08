@@ -38,15 +38,15 @@ import re
 # %% ----- CHANGE THESE -----
 
 #Set the speciment ID name
-specimenName = 'S9_l'
+specimenName = 'S8_l'
 
 #Set the condition folder name and what to rename it to
-conditionName = 'split50'
-conditionRename = 'split50' #split50, split25_upper, split25_lower
+conditionName = 'split25_upper'
+conditionRename = 'split25_upper' #split50, split25_upper, split25_lower
 
 #Set the position labels and what to rename to
-positionNames = ['_0deg_', '_30deg_', '_60deg_',
-                 '_90deg_', '_ABER_', '_Apreh_'] #need underscore as 0abd is in X0abd
+positionNames = ['_0Abd_', '_30Abd_', '_60Abd_',
+                 '_90Abd_', '_ABER_', '_Apreh_'] #need underscore as 0abd is in X0abd
 #Sometimes position names are modified within the same section, and hence need to use a 2nd option sometimes
 positionNames2 = ['_0abd_', '_30abd_', '_60abd_',
                  '_90abd_', '_ABER_', '_apreh_'] #need underscore as 0abd is in X0abd
@@ -59,7 +59,7 @@ planeNames = [' SP', ' TP']
 planeNames2 = ['_SP', '_TP']
 
 #Set preface for scanning ID (there are sometimes multiples of certain scans to consider)
-prefaceLabel = 'D0507_T'
+prefaceLabel = 'D1205_T'
 
 # %% Set-up
 
@@ -217,15 +217,15 @@ for dd in range(len(dirList)):
 #Jump back up to the main directory
 os.chdir('..')
 
-#Rename the condition directory
-#Double check if there is a folder already with this name
-if conditionRename in os.listdir():
-    #Raise an error
-    raise ValueError('Proposed renamed condition already present in directory.')
-else:
-    #Rename the folder
-    #Need to use shutil here rather than os to get around permission errors
-    shutil.move(conditionName, conditionRename)
+# #Rename the condition directory
+# #Double check if there is a folder already with this name
+# if conditionRename in os.listdir():
+#     #Raise an error
+#     raise ValueError('Proposed renamed condition already present in directory.')
+# else:
+#     #Rename the folder
+#     #Need to use shutil here rather than os to get around permission errors
+#     shutil.move(conditionName, conditionRename)
     
 # %% Finish up
     

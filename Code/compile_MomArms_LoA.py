@@ -32,7 +32,7 @@ from scipy.optimize import curve_fit
 # %% Parameters to change
 
 #Provide list of specimen to extract data from
-specimenNames = ['S1_r', 'S2_r', 'S3_r', 'S4_l', 'S5_l', 'S6_r', 'S7_r']
+specimenNames = ['S1_r', 'S2_r', 'S3_r', 'S4_l', 'S5_l', 'S6_r', 'S7_r', 'S9_l']
 
 #Provide list of conditions to extract data from
 conditionNames = ['split50']
@@ -45,8 +45,8 @@ posLabels = ['0'+u'\u00b0'+' Abd.',
              'ABER', 'Apprehension']
 
 #Provide list of loads to extract data from
-loadNames = ['_0N', '_40N']
-loadLabels = ['0N', '40N']
+loadNames = ['_0N', '_20N', '_40N']
+loadLabels = ['0N', '20N', '40N']
 
 #Provide list of planes to extract data from
 planeNames = ['_SP', '_TP']
@@ -73,6 +73,9 @@ rcParams['ytick.major.width'] = 1.5
 rcParams['legend.framealpha'] = 0.0
 rcParams['savefig.dpi'] = 300
 rcParams['savefig.format'] = 'pdf'
+
+#Set grey color palette for three loads
+greyPal = ['#e2e2e2', '#6a6a6a', '#000000']
 
 #Set code directory to return to
 homeDir = os.getcwd()
@@ -164,8 +167,23 @@ for specimen in specimenNames:
                             
                     except:
                         
-                        print(f'Condition {pos}{load}{plane} skipped for {specimen}')
+                        #Place nan values for current condition                        
+                        print(f'NaNs inserted for condition {pos}{load}{plane} for {specimen}')
                         
+                        #Loop through muscle regions
+                        for subscap in subscapNames:
+                            
+                            #Append values and info to data dictionary
+                            dataDict['specimen'].append(specimen.split('_')[0])
+                            dataDict['condition'].append(condition)
+                            dataDict['region'].append(subscap)
+                            dataDict['position'].append(pos)
+                            dataDict['load'].append(load.split('_')[-1])
+                            dataDict['plane'].append(plane.split('_')[-1])
+                            dataDict['lineOfAction'].append(np.nan)
+                            dataDict['momentArm'].append(np.nan)
+                            dataDict['stabilityRatio'].append(np.nan)
+                            
                     #Return to specimen directory
                     os.chdir('..')
                     
@@ -174,11 +192,27 @@ for specimen in specimenNames:
                         
 #Convert to dataframe
 groupData = pd.DataFrame.from_dict(dataDict)
+
+#Export group data
+groupData.to_csv(homeDir+'\\..\\Results\\Processed\\groupData.csv',
+                 index = False)
                     
 # %% Summarise data
 
 #Group data by region, position, load and plane and describe
-describedData = groupData.groupby(['region','position','load','plane']).describe()
+describedData = groupData.groupby(['region','position','load','plane']).describe().loc[['mean','sd']]
+
+#Group and describe just loa data
+describedData_loa = groupData.drop(['momentArm', 'stabilityRatio'],
+                                   axis = 1).groupby(['region',
+                                                      'position',
+                                                      'load',
+                                                      'plane']).describe(
+                                                          ).loc[:,(slice(None),['mean','std'])]
+
+#Export loa summary data
+describedData_loa.to_csv('..\\Results\\Processed\\summaryLoA_groupData.csv',
+                         index = True)
 
 # %% Optimise curve fitting for line of action to stability ratio
 
@@ -193,7 +227,7 @@ xFit = groupData.loc[groupData['plane'] == 'SP']['lineOfAction']
 yFit = groupData.loc[groupData['plane'] == 'SP']['stabilityRatio']
 
 #Fit the cubic function
-pars_SP, cov_SP = curve_fit(f = cubic, xdata = xFit, ydata = yFit, #function & data
+pars_SP, cov_SP = curve_fit(f = cubic, xdata = xFit.dropna(), ydata = yFit.dropna(), #function & data
                             p0 = [0, 0, 0, 0], bounds = (-np.inf, np.inf)) #initial guess & bounds
 
 # Get the standard deviations of the parameters (square roots of the # diagonal of the covariance)
@@ -215,7 +249,7 @@ xFit = groupData.loc[groupData['plane'] == 'TP']['lineOfAction']
 yFit = groupData.loc[groupData['plane'] == 'TP']['stabilityRatio']
 
 #Fit the cubic function
-pars_TP, cov_TP = curve_fit(f = cubic, xdata = xFit, ydata = yFit, #function & data
+pars_TP, cov_TP = curve_fit(f = cubic, xdata = xFit.dropna(), ydata = yFit.dropna(), #function & data
                             p0 = [0, 0, 0, 0], bounds = (-np.inf, np.inf)) #initial guess & bounds
 
 # Get the standard deviations of the parameters (square roots of the # diagonal of the covariance)
@@ -232,7 +266,7 @@ fitRes_TP = yFit - cubic(xFit, *pars_TP)
 
 # %% Visualise data
 
-##### TODO: this is currently done for ANZSB abstract --- needs to be optimised
+##### TODO: this is currently done for minimal dataset --- needs to be optimised
 ##### to include all data/better formatted
 
 #Get max and min values in each plane to set y-axis limits
@@ -250,41 +284,52 @@ fig, ax = plt.subplots(nrows = 4, ncols = 2,
 #Loop through regions for scapula plane
 for subscap in subscapNames:
     
-    #Create boxplot on relevant axis
-    #Line of action data
-    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
-                                          (groupData['region'] == subscap)],
-                     x = 'position', y = 'lineOfAction',
-                     order = posNames, hue = 'load',
-                     palette = ['black', 'red'], width = 0.4, whis = [0,100],
-                     ax = ax[subscapNames.index(subscap),0])
+    #Create mean/SD point plot on relevant axis
+    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+                                            (groupData['region'] == subscap)],
+                       x = 'position', y = 'lineOfAction', ci = 'sd',
+                       order = posNames, hue = 'load',
+                       palette = greyPal, markers = 's', markersize = 1,
+                       join = False, dodge = 0.5, zorder = 3,
+                       ax = ax[subscapNames.index(subscap),0])
     
-    #Adjust colours of boxplot lines and fill
-    for ii in range(len(bx.artists)):
-        
-        #Get the current artist
-        artist = bx.artists[ii]
-        
-        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
-        col = artist.get_facecolor()
-        artist.set_edgecolor(col)
-        artist.set_facecolor('None')
+    # #Create boxplot on relevant axis
+    # #Line of action data
+    # bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #                                       (groupData['region'] == subscap)],
+    #                  x = 'position', y = 'lineOfAction',
+    #                  order = posNames, hue = 'load',
+    #                  palette = 'Greys', width = 0.3, whis = [0,100],
+    #                  ax = ax[subscapNames.index(subscap),0])
     
-        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
-        #Loop over them here, and use the same colour as above
-        for jj in range(ii*6,ii*6+6):
-            line = ax[subscapNames.index(subscap),0].lines[jj]
-            line.set_color(col)
-            line.set_mfc(col)
-            line.set_mec(col)
+    # #Adjust colours of boxplot lines and fill
+    # for ii in range(len(bx.artists)):
+        
+    #     #Get the current artist
+    #     artist = bx.artists[ii]
+        
+    #     #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+    #     col = artist.get_facecolor()
+    #     artist.set_edgecolor(col)
+    #     artist.set_facecolor('None')
+    
+    #     #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+    #     #Loop over them here, and use the same colour as above
+    #     for jj in range(ii*6,ii*6+6):
+    #         line = ax[subscapNames.index(subscap),0].lines[jj]
+    #         line.set_color(col)
+    #         line.set_mfc(col)
+    #         line.set_mec(col)
     
     #Add point plot
     sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                           (groupData['region'] == subscap)],
                        x = 'position', y = 'lineOfAction',
                        order = posNames, hue = 'load',
-                       palette = ['black', 'red'], size = 3, linewidth = 0,
-                       dodge = 0.5, alpha = 0.5,
+                       palette = greyPal, 
+                       edgecolor = 'black', #facecolor = 'white',
+                       size = 3, linewidth = 1,
+                       dodge = 0.5, alpha = 1, zorder = 4,
                        ax = ax[subscapNames.index(subscap),0])
     
     #Remove x-axis label
@@ -349,44 +394,55 @@ for subscap in subscapNames:
     
     ### TODO: add images and labels on axes...
     
-#Loop through regions for scapula plane
+#Loop through regions for transverse plane
 for subscap in subscapNames:
     
-    #Create boxplot on relevant axis
-    #Line of action data
-    bx2 = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'TP') &
-                                          (groupData['region'] == subscap)],
-                     x = 'position', y = 'lineOfAction',
-                     order = posNames, hue = 'load',
-                     palette = ['black', 'red'], width = 0.4, whis = [0,100],
-                     ax = ax[subscapNames.index(subscap),1])
+    #Create mean/SD point plot on relevant axis
+    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+                                            (groupData['region'] == subscap)],
+                       x = 'position', y = 'lineOfAction', ci = 'sd',
+                       order = posNames, hue = 'load',
+                       palette = greyPal, markers = 's', markersize = 1,
+                       join = False, dodge = 0.5, zorder = 3,
+                       ax = ax[subscapNames.index(subscap),1])
     
-    #Adjust colours of boxplot lines and fill
-    for ii in range(len(bx2.artists)):
-        
-        #Get the current artist
-        artist = bx2.artists[ii]
-        
-        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
-        col = artist.get_facecolor()
-        artist.set_edgecolor(col)
-        artist.set_facecolor('None')
+    # #Create boxplot on relevant axis
+    # #Line of action data
+    # bx2 = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #                                       (groupData['region'] == subscap)],
+    #                  x = 'position', y = 'lineOfAction',
+    #                  order = posNames, hue = 'load',
+    #                  palette = ['black', 'red'], width = 0.4, whis = [0,100],
+    #                  ax = ax[subscapNames.index(subscap),1])
     
-        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
-        #Loop over them here, and use the same colour as above
-        for jj in range(ii*6,ii*6+6):
-            line = ax[subscapNames.index(subscap),1].lines[jj]
-            line.set_color(col)
-            line.set_mfc(col)
-            line.set_mec(col)
+    # #Adjust colours of boxplot lines and fill
+    # for ii in range(len(bx2.artists)):
+        
+    #     #Get the current artist
+    #     artist = bx2.artists[ii]
+        
+    #     #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+    #     col = artist.get_facecolor()
+    #     artist.set_edgecolor(col)
+    #     artist.set_facecolor('None')
+    
+    #     #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+    #     #Loop over them here, and use the same colour as above
+    #     for jj in range(ii*6,ii*6+6):
+    #         line = ax[subscapNames.index(subscap),1].lines[jj]
+    #         line.set_color(col)
+    #         line.set_mfc(col)
+    #         line.set_mec(col)
     
     #Add point plot
-    sp2 = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
-                                             (groupData['region'] == subscap)],
+    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+                                          (groupData['region'] == subscap)],
                        x = 'position', y = 'lineOfAction',
                        order = posNames, hue = 'load',
-                       palette = ['black', 'red'], size = 3, linewidth = 0,
-                       dodge = 0.5, alpha = 0.5,
+                       palette = greyPal, 
+                       edgecolor = 'black', #facecolor = 'white',
+                       size = 3, linewidth = 1,
+                       dodge = 0.5, alpha = 1, zorder = 4,
                        ax = ax[subscapNames.index(subscap),1])
     
     #Remove x-axis label
@@ -459,70 +515,34 @@ for subscap in subscapNames:
     
     ### TODO: add images and labels on axes...
     
-    
-        
 #Tight layout
 plt.tight_layout()
 
-
 #Save figure
-#### TODO: finish up aspects outlined above --- this export is just for ANZORS
-fig.savefig('..\\Results\\Figures\\ANZORSfigure.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\loa_Fig.png', dpi = 300, format = 'png')
+
+# %% OLD TEST CODE BELOW...
+
+
+
 
 
 # %%
 
 # %% Displaysome basic mean/SD parameters
 
-#Each region for X abduction in X plane with X load
-currPos = 'abd90'
-currPlane = 'TP'
-currLoad = '40N'
-for subscap in subscapNames:
-    mu = np.median(groupData.loc[(groupData['region'] == subscap) &
-                               (groupData['plane'] == currPlane) &
-                               (groupData['position'] == currPos) &
-                               (groupData['load'] == currLoad),['lineOfAction']].to_numpy())
-    sigma25,sigma75 = np.percentile(groupData.loc[(groupData['region'] == subscap) &
-                                                     (groupData['plane'] == currPlane) &
-                                                     (groupData['position'] == currPos) &
-                                                     (groupData['load'] == currLoad),['lineOfAction']].to_numpy(), [25,75])
-    print(f'{currPlane}.{subscap}_{currPos}_{currLoad} = [{mu},{sigma25},{sigma75}];')
-
-# %%
-                        
-
-
-from scipy.interpolate import interp1d
-
-interpolation = interp1d(groupData.loc[groupData['plane'] == 'SP']['lineOfAction'].to_numpy(),
-                         groupData.loc[groupData['plane'] == 'SP']['stabilityRatio'].to_numpy(),
-                         kind = 'cubic')
-
-xnew = np.arange(np.min(groupData.loc[groupData['plane'] == 'SP']['lineOfAction'].to_numpy()),
-                 np.max(groupData.loc[groupData['plane'] == 'SP']['lineOfAction'].to_numpy()),
-                 0.1)
-ynew = interpolation(xnew)   # use interpolation function returned by `interp1d`
-plt.plot(xnew, ynew, '-', color = 'r')
-
-#### stability ratio seem OK - cubic looking relationship that can be pretty perfectly
-#### fitted with a cubic interpolation
-
-#### I don't think interp1d gives an equation, so if we wanted to map that then
-#### need to fit a curve rather than interpolation
-
-sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
-                                 (groupData['region'] == 'ss1')],
-            x = 'position', y = 'lineOfAction',
-            order = posNames, hue = 'load')
-
-plt.figure()
-
-sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
-                                 (groupData['region'] == 'ss1')],
-            x = 'position', y = 'stabilityRatio',
-            order = posNames, hue = 'load')
-
-#### boxplots identical so should be easy enough to map on 2nd axis
-
+# #Each region for X abduction in X plane with X load
+# currPos = 'abd90'
+# currPlane = 'TP'
+# currLoad = '40N'
+# for subscap in subscapNames:
+#     mu = np.median(groupData.loc[(groupData['region'] == subscap) &
+#                                (groupData['plane'] == currPlane) &
+#                                (groupData['position'] == currPos) &
+#                                (groupData['load'] == currLoad),['lineOfAction']].to_numpy())
+#     sigma25,sigma75 = np.percentile(groupData.loc[(groupData['region'] == subscap) &
+#                                                      (groupData['plane'] == currPlane) &
+#                                                      (groupData['position'] == currPos) &
+#                                                      (groupData['load'] == currLoad),['lineOfAction']].to_numpy(), [25,75])
+#     print(f'{currPlane}.{subscap}_{currPos}_{currLoad} = [{mu},{sigma25},{sigma75}];')
 

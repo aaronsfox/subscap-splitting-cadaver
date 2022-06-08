@@ -35,7 +35,7 @@ from shutil import copy2, rmtree
 ##### ----- CHECK AND CHANGE THESE PARAMETERS EACH RUN ----- #####
 
 #Specimen to analyse
-specimen = 'S7_r' #specimen number and label for limb tested
+specimen = 'S4_l' #specimen number and label for limb tested
 
 #Latarjet condition to analyse
 latarjetCond = 'split50' #split50, split25_upper, split25_lower
@@ -45,8 +45,12 @@ phantomType_SP = 'sphere' #sphere, toroid
 phantomType_TP = 'sphere' #sphere, toroid
 
 #Set phantom diameter for scaling
-phantomDiameter_SP = 7.93
-phantomDiameter_TP = 2.45
+phantomDiameter_SP = 6.5
+phantomDiameter_TP = 6.5
+
+#Options for checking data
+checkGlenoidFit = False
+checkHeadSize = False
 
 # %% Define functions
 
@@ -308,7 +312,19 @@ def visGlenoidFit():
     #Plot image
     ax[0].imshow(refImg, cmap = 'gray', origin = 'upper')
     #Plot originally digitised reference points
-    ax[0].scatter(refPts['X'], refPts['Y'], c = 'green', s = 7)   
+    ax[0].scatter(refPts['X'], refPts['Y'],
+                  c = 'orange', zorder = 3,
+                  s = 7)
+    #Plot transformed digitised reference points
+    ax[0].scatter(newPts[:,0], newPts[:,1],
+                  c = 'green', zorder = 3,
+                  s = 7)
+    #Plot line between points
+    for ptNo in range(len(newPts)):
+        ax[0].plot((refPts['X'][ptNo],newPts[ptNo,0]),
+                   (refPts['Y'][ptNo],newPts[ptNo,1]),
+                   c = 'green', lw = 1.5, zorder = 2)
+    
     #Plot glenoid points and fit a line
     ax[0].scatter(gpPts[:,0], gpPts[:,1], c = 'yellow', s = 7)
     m,c = np.polyfit(gpPts[:,0], gpPts[:,1], 1)
@@ -319,8 +335,8 @@ def visGlenoidFit():
     
     #Plot transformed estimates on to original image
     ax[0].scatter(newPts[:,0], newPts[:,1],
-                  edgecolor = 'red', facecolor = None,
-                  s = 7)
+                  edgecolor = 'red', facecolor = 'none',
+                  s = 7, zorder = 4)
     
     #Plot current glenoid image
     ax[1].imshow(img, cmap = 'gray', origin = 'upper')
@@ -329,11 +345,12 @@ def visGlenoidFit():
     ax[1].axis('off')
     
     #Plot current image digitised points
-    ax[1].scatter(refPts['X'], refPts['Y'], c = 'red', s = 7)
+    ax[1].scatter(refPts['X'], refPts['Y'], c = 'red',
+                  s = 7)
     
     #Plot estimated glenoid plane points and fit line
     ax[1].scatter(gpPts_trans[:,0], gpPts_trans[:,1],
-                  edgecolor = 'yellow', facecolor = None,
+                  edgecolor = 'yellow', facecolor = 'none',
                   s = 7)
     m,c = np.polyfit(gpPts_trans[:,0], gpPts_trans[:,1], 1)
     ax[1].plot(gpPts_trans[:,0], m * gpPts_trans[:,0] + c, c = 'yellow',
@@ -1126,9 +1143,7 @@ for currDir in dirList:
         analyseDir = False
     else:
         analyseDir = True
-		
-	##### TODO: check for all necessary files - flag error or print notification???
-        
+		        
     #Run calculations if data is available
     if analyseDir:
         
@@ -1273,7 +1288,7 @@ for currDir in dirList:
             if 'SP' in currPlaneName:
                 refImg = gpData_SP[refDir]['refImg'][0]
             elif 'TP' in currPlaneName:
-                refImg = gpData_TP[refDir]['refImg'][0]            
+                refImg = gpData_TP[refDir]['refImg'][0]
                 
             #Visualise new points on image alongside point alignment comparison
             visGlenoidFit()
@@ -1322,113 +1337,137 @@ for currDir in dirList:
     os.chdir('..')
 
 # %% Review glenoid fitting
-    
-# #This section should be run in isolation as it places the esimated glenoid plane
-# #images in a 'temp' folder to review, and also prints out the residual error from
-# #the fitting process.
 
-# #Create folder to store temp images in
-# os.mkdir('tmp')
-# tmpDir = os.getcwd()+'\\tmp\\'
+if checkGlenoidFit:
 
-# #Print headline for residual errors
-# print('Residual error values from fitted images:\n')
-
-# #Loop through directories
-# for currDir in dirList:
+    #Need to do this process to double check that there aren't drastic changes in
+    #the accuracy of the points. There are some obvious times where the accuracy 
+    #of the points 'skips' / 'changes' and this would indicate a re-digitising of
+    #the glenoid plane is required --- and then subsequently re-run this pipeline.
+    #Use the below code to map to the data notes at which trial the glenoid plane 
+    #needs to be re-defined.
     
-#     #Navigate to current directory
-#     os.chdir(currDir)
+    #This section should be run in isolation as it places the esimated glenoid plane
+    #images in a 'temp' folder to review, and also prints out the residual error from
+    #the fitting process.
     
-#     #Search for the presence of residual glenoid fit data
-#     if not glob('glenoidPlaneFit_resErr.txt'):
-#         #Set to not analyse this folder
-#         fitDir = False
-#     else:
-#         fitDir = True
-        
-#     #Run calculations if data is available
-#     if fitDir:
-        
-#         #Load the text file and extract the value
-#         with open('glenoidPlaneFit_resErr.txt', 'r') as f:
-#             val = f.read()
-#             print(currDir.split('\\')[-2]+': '+val)
-#         f.close()
-        
-#         #Copy the image file to the temp directory
-#         copy2(os.getcwd()+'\\estimatedGlenoidPlaneFit.png', tmpDir)
-        
-#         #Rename file to avoid overwrite errors
-#         os.rename(tmpDir+'estimatedGlenoidPlaneFit.png',
-#                   tmpDir+currDir.split('\\')[-2]+'.png')
-        
-#     #Return up to main directory
-#     os.chdir('..')
+    #Create folder to store temp images in
+    os.mkdir('tmp')
+    os.chdir('tmp')
+    os.mkdir('SP')
+    os.mkdir('TP')
+    tmpDir_SP = os.getcwd()+'\\SP\\'
+    tmpDir_TP = os.getcwd()+'\\TP\\'
     
-# #There's the opportunity to pause here now and review the images transferred to
-# #the temp directory to see how well the glenoid plane has been fitted, alongside
-# #the printed out values in reviewing the effectiveness of the process
+    #Print headline for residual errors
+    print('Residual error values from fitted images:\n')
     
-# %% Clean-up after reviewing glenoid fitting
-
-# #Delete the temp folder
-# rmtree('tmp', ignore_errors = True)
+    #Loop through directories
+    for currDir in dirList:
+        
+        #Navigate to current directory
+        os.chdir(currDir)
+        
+        #Search for the presence of residual glenoid fit data
+        if not glob('glenoidPlaneFit_resErr.txt'):
+            #Set to not analyse this folder
+            fitDir = False
+        else:
+            fitDir = True
+            
+        #Run calculations if data is available
+        if fitDir:
+            
+            #Load the text file and extract the value
+            with open('glenoidPlaneFit_resErr.txt', 'r') as f:
+                val = f.read()
+                print(currDir.split('\\')[-2]+': '+val)
+            f.close()
+            
+            #Copy the image file to the temp directory
+            if '_SP_' in currDir.split('\\')[-2]:
+                #Copy file
+                copy2(os.getcwd()+'\\estimatedGlenoidPlaneFit.png', tmpDir_SP)
+                #Rename file
+                os.rename(tmpDir_SP+'estimatedGlenoidPlaneFit.png',
+                          tmpDir_SP+currDir.split('\\')[-2]+'.png')
+            elif '_TP_' in currDir.split('\\')[-2]:
+                #Copy file
+                copy2(os.getcwd()+'\\estimatedGlenoidPlaneFit.png', tmpDir_TP)
+                #Rename file
+                os.rename(tmpDir_TP+'estimatedGlenoidPlaneFit.png',
+                          tmpDir_TP+currDir.split('\\')[-2]+'.png')
+            
+        #Return up to main directory
+        os.chdir('..')
+        
+    #There's the opportunity to pause here now and review the images transferred to
+    #the temp directory to see how well the glenoid plane has been fitted, alongside
+    #the printed out values in reviewing the effectiveness of the process
+    
+    #Clean-up after reviewing glenoid fitting
+    
+    #Delete the temp folder
+    rmtree('tmp', ignore_errors = True)
 
 # %% Investigate humeral head size as a consistency reference
 
-# #Look through each analysed folder and calculate humeral head size
+if checkHeadSize:
 
-# #Print headline for residual errors
-# print('Humeral head size from digitised images:\n')
-
-# #Spot to store values to calculate mean and SD at the end
-# hhDiameters_SP = []
-# hhDiameters_TP = []
-
-# #Loop through directories
-# for currDir in dirList:
+    #Look through each analysed folder and calculate humeral head size
     
-#     #Navigate to current directory
-#     os.chdir(currDir)
+    #Print headline for residual errors
+    print('Humeral head size from digitised images:\n')
     
-#     #Search for the presence of residual glenoid fit data
-#     if not glob('hh.csv'):
-#         #Set to not analyse this folder
-#         analyseDir = False
-#     else:
-#         analyseDir = True
+    #Spot to store values to calculate mean and SD at the end
+    hhDiameters_SP = []
+    hhDiameters_TP = []
+    
+    #Loop through directories
+    for currDir in dirList:
         
-#     #Run calculations if data is available
-#     if analyseDir:
+        #Navigate to current directory
+        os.chdir(currDir)
         
-#         #Load humeral head points
-#         hhPoints = pd.read_csv('hh.csv')
-        
-#         #Fit circle to humeral head
-#         hhCentreX, hhCentreY, hhRadius = fitCircle(hhPoints['X'].to_numpy(),
-#                                                     hhPoints['Y'].to_numpy())
-        
-#         #Get plane for scaling
-#         currPlane = []
-#         for plane in planeNames:
-#             if re.search(plane, currDir.split('\\')[-2]):
-#                 #Set the current position to this label
-#                 currPlane.append(plane)
-        
-#         #Print out value for current image
-#         if 'SP' in currPlane[0]:
-#             print(currDir.split('\\')[-2]+': '+str(np.round(hhRadius*2/phantomScale_SP)))
-#             hhDiameters_SP.append(hhRadius*2/phantomScale_SP)
-#         elif 'TP' in currPlane[0]:
-#             print(currDir.split('\\')[-2]+': '+str(np.round(hhRadius*2/phantomScale_TP)))
-#             hhDiameters_TP.append(hhRadius*2/phantomScale_TP)
+        #Search for the presence of residual glenoid fit data
+        if not glob('hh.csv'):
+            #Set to not analyse this folder
+            analyseDir = False
+        else:
+            analyseDir = True
+            
+        #Run calculations if data is available
+        if analyseDir:
+            
+            #Load humeral head points
+            hhPoints = pd.read_csv('hh.csv')
+            
+            #Fit circle to humeral head
+            hhCentreX, hhCentreY, hhRadius = fitCircle(hhPoints['X'].to_numpy(),
+                                                        hhPoints['Y'].to_numpy())
+            
+            #Get plane for scaling
+            currPlane = []
+            for plane in planeNames:
+                if re.search(plane, currDir.split('\\')[-2]):
+                    #Set the current position to this label
+                    currPlane.append(plane)
+            
+            #Print out value for current image
+            if 'SP' in currPlane[0]:
+                print(currDir.split('\\')[-2]+': '+str(np.round(hhRadius*2/phantomScale_SP)))
+                hhDiameters_SP.append(hhRadius*2/phantomScale_SP)
+            elif 'TP' in currPlane[0]:
+                print(currDir.split('\\')[-2]+': '+str(np.round(hhRadius*2/phantomScale_TP)))
+                hhDiameters_TP.append(hhRadius*2/phantomScale_TP)
+    
+        #Return to data directory
+        os.chdir('..')
+    
+    #Print summary values
+    print(f'Humeral head size for scapular plane: {np.round(np.mean(hhDiameters_SP),2)} \u00B1 {np.round(np.std(hhDiameters_SP),2)}')
+    print(f'Humeral head size for transverse plane: {np.round(np.mean(hhDiameters_TP),2)} \u00B1 {np.round(np.std(hhDiameters_TP),2)}')
 
-#     #Return to data directory
-#     os.chdir('..')
-
-# #Print summary values
-# print(f'Humeral head size for scapular plane: {np.round(np.mean(hhDiameters_SP),2)} \u00B1 {np.round(np.std(hhDiameters_SP),2)}')
-# print(f'Humeral head size for transverse plane: {np.round(np.mean(hhDiameters_TP),2)} \u00B1 {np.round(np.std(hhDiameters_TP),2)}')
+# %% TODO: same tmp folder for other images exported? MA's, LOAs etc.???
 
 # %% -----
