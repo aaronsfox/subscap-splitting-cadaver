@@ -264,10 +264,7 @@ fitRes_TP = yFit - cubic(xFit, *pars_TP)
 #           cubic(np.linspace(130, 250, 100), *pars_TP),
 #           linestyle = '--', linewidth = 2, color = 'black')
 
-# %% Visualise data
-
-##### TODO: this is currently done for minimal dataset --- needs to be optimised
-##### to include all data/better formatted
+# %% Visualise data - LoA
 
 #Get max and min values in each plane to set y-axis limits
 #Scapular plane
@@ -369,28 +366,28 @@ for subscap in subscapNames:
     ax[subscapNames.index(subscap),0].set_ylim([loaMin_SP - (loaMax_SP*0.025),
                                                 loaMax_SP + (loaMax_SP*0.025)])
     
-    #Add twin axis for stability ratio values
-    ax2 = ax[subscapNames.index(subscap),0].twinx()
+    # #Add twin axis for stability ratio values
+    # ax2 = ax[subscapNames.index(subscap),0].twinx()
     
-    #Get y-axis limits of line of action axis and map these to stability ratio
-    #axis using fit cubic function
-    #Get the limits and set to the same on secondary axis
-    loaLimits = ax[subscapNames.index(subscap),0].get_ylim()
-    ax2.set_ylim(loaLimits)
+    # #Get y-axis limits of line of action axis and map these to stability ratio
+    # #axis using fit cubic function
+    # #Get the limits and set to the same on secondary axis
+    # loaLimits = ax[subscapNames.index(subscap),0].get_ylim()
+    # ax2.set_ylim(loaLimits)
     
-    #Calculate values for stability ratio y-ticks using function
-    srTicks = np.round(cubic(ax2.get_yticks(), *pars_SP), 1)
-    #Fix up -0 value if present
-    for ii, element in enumerate(srTicks):
-        if element == -0.0:
-            srTicks[ii] = 0.0
+    # #Calculate values for stability ratio y-ticks using function
+    # srTicks = np.round(cubic(ax2.get_yticks(), *pars_SP), 1)
+    # #Fix up -0 value if present
+    # for ii, element in enumerate(srTicks):
+    #     if element == -0.0:
+    #         srTicks[ii] = 0.0
     
-    #Change tick labels on stability ratio axis
-    ax2.set_yticklabels(srTicks)
+    # #Change tick labels on stability ratio axis
+    # ax2.set_yticklabels(srTicks)
     
-    #Add y-label for stability ratio
-    ax2.set_ylabel('Stability Ratio',
-                   fontsize = 10, fontweight = 'bold')
+    # #Add y-label for stability ratio
+    # ax2.set_ylabel('Stability Ratio',
+    #                fontsize = 10, fontweight = 'bold')
     
     ### TODO: add images and labels on axes...
     
@@ -486,32 +483,32 @@ for subscap in subscapNames:
     ##### TODO: sort this out better...
     ax[subscapNames.index(subscap),1].set_yticks(np.array([150, 180, 210, 240]))
     
-    #Add twin axis for stability ratio values
-    ax2 = ax[subscapNames.index(subscap),1].twinx()
+    # #Add twin axis for stability ratio values
+    # ax2 = ax[subscapNames.index(subscap),1].twinx()
     
-    #Get y-axis limits of line of action axis and map these to stability ratio
-    #axis using fit cubic function
-    #Get the limits and set to the same on secondary axis
-    loaLimits = ax[subscapNames.index(subscap),1].get_ylim()
-    ax2.set_ylim(loaLimits)
+    # #Get y-axis limits of line of action axis and map these to stability ratio
+    # #axis using fit cubic function
+    # #Get the limits and set to the same on secondary axis
+    # loaLimits = ax[subscapNames.index(subscap),1].get_ylim()
+    # ax2.set_ylim(loaLimits)
     
-    #Match y-axis ticks
-    #### TODO: fix up less manual
-    ax2.set_yticks(np.array([150, 180, 210, 240]))
+    # #Match y-axis ticks
+    # #### TODO: fix up less manual
+    # ax2.set_yticks(np.array([150, 180, 210, 240]))
     
-    #Calculate values for stability ratio y-ticks using function
-    srTicks = np.round(cubic(ax2.get_yticks(), *pars_TP), 1)
-    #Fix up -0 value if present
-    for ii, element in enumerate(srTicks):
-        if element == -0.0:
-            srTicks[ii] = 0.0
+    # #Calculate values for stability ratio y-ticks using function
+    # srTicks = np.round(cubic(ax2.get_yticks(), *pars_TP), 1)
+    # #Fix up -0 value if present
+    # for ii, element in enumerate(srTicks):
+    #     if element == -0.0:
+    #         srTicks[ii] = 0.0
     
-    #Change tick labels on stability ratio axis
-    ax2.set_yticklabels(srTicks)
+    # #Change tick labels on stability ratio axis
+    # ax2.set_yticklabels(srTicks)
     
-    #Add y-label for stability ratio
-    ax2.set_ylabel('Stability Ratio',
-                   fontsize = 10, fontweight = 'bold')
+    # #Add y-label for stability ratio
+    # ax2.set_ylabel('Stability Ratio',
+    #                fontsize = 10, fontweight = 'bold')
     
     ### TODO: add images and labels on axes...
     
@@ -519,7 +516,156 @@ for subscap in subscapNames:
 plt.tight_layout()
 
 #Save figure
-fig.savefig('..\\Results\\Figures\\loa_Fig.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.png', dpi = 300, format = 'png')
+
+#Close figure
+plt.close()
+
+# %% Visualise data - moment arms
+
+#Get max and min values in each plane to set y-axis limits
+#Scapular plane
+maMax_SP = np.max(groupData.loc[groupData['plane'] == 'SP']['momentArm'])
+maMin_SP = np.min(groupData.loc[groupData['plane'] == 'SP']['momentArm'])
+#Transverse plane
+maMax_TP = np.max(groupData.loc[groupData['plane'] == 'TP']['momentArm'])
+maMin_TP = np.min(groupData.loc[groupData['plane'] == 'TP']['momentArm'])
+
+#Create figure
+fig, ax = plt.subplots(nrows = 4, ncols = 2,
+                       figsize = (10,10))
+
+#Loop through regions for scapula plane
+for subscap in subscapNames:
+    
+    #Create mean/SD point plot on relevant axis
+    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+                                            (groupData['region'] == subscap)],
+                       x = 'position', y = 'momentArm', ci = 'sd',
+                       order = posNames, hue = 'load',
+                       palette = greyPal, markers = 's', markersize = 1,
+                       join = False, dodge = 0.5, zorder = 3,
+                       ax = ax[subscapNames.index(subscap),0])
+    
+    #Add point plot
+    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+                                          (groupData['region'] == subscap)],
+                       x = 'position', y = 'momentArm',
+                       order = posNames, hue = 'load',
+                       palette = greyPal, 
+                       edgecolor = 'black', #facecolor = 'white',
+                       size = 3, linewidth = 1,
+                       dodge = 0.5, alpha = 1, zorder = 4,
+                       ax = ax[subscapNames.index(subscap),0])
+    
+    #Remove x-axis label
+    ax[subscapNames.index(subscap),0].set_xlabel('')
+    
+    #Set x-axes tick labels if bottom row
+    if subscapNames.index(subscap) == len(subscapNames)-1:
+        #Set axis tick labels
+        ax[subscapNames.index(subscap),0].set_xticklabels(posLabels,
+                                                          fontsize = 10,
+                                                          fontweight = 'bold',
+                                                          rotation = 45,
+                                                          ha = 'right')
+    else:
+        #Remove tick labels
+        ax[subscapNames.index(subscap),0].set_xticklabels([])
+        
+    #Set title
+    ax[subscapNames.index(subscap),0].set_title(subscapLabels[subscapNames.index(subscap)],
+                                                fontsize = 12, fontweight = 'bold')
+    
+    #Set y-axis label
+    ax[subscapNames.index(subscap),0].set_ylabel('Moment Arm (mm)\n(\u2190Abduction / Adduction\u2192)',
+                                                 fontsize = 10, fontweight = 'bold')
+    
+    #Add 'zero' line
+    ax[subscapNames.index(subscap),0].axhline(y = 0,
+                                              color = 'lightgrey',
+                                              linewidth = 1, linestyle = '--',
+                                              zorder = 0)
+    
+    #Remove legend
+    ax[subscapNames.index(subscap),0].get_legend().remove()
+    
+    #Set y-axis limit to max and minimum values in dataset for plane
+    #Add a buffer of 10%
+    ax[subscapNames.index(subscap),0].set_ylim([maMin_SP - (maMax_SP*0.1),
+                                                maMax_SP + (maMax_SP*0.1)])
+    
+    #Set y-axis labels appropriately
+    ax[subscapNames.index(subscap),0].set_yticks(np.array([-30,-20,-10,0,10,20,30]))
+    
+#Loop through regions for transverse plane
+for subscap in subscapNames:
+    
+    #Create mean/SD point plot on relevant axis
+    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+                                            (groupData['region'] == subscap)],
+                       x = 'position', y = 'momentArm', ci = 'sd',
+                       order = posNames, hue = 'load',
+                       palette = greyPal, markers = 's', markersize = 1,
+                       join = False, dodge = 0.5, zorder = 3,
+                       ax = ax[subscapNames.index(subscap),1])
+    
+    #Add point plot
+    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+                                          (groupData['region'] == subscap)],
+                       x = 'position', y = 'momentArm',
+                       order = posNames, hue = 'load',
+                       palette = greyPal, 
+                       edgecolor = 'black', #facecolor = 'white',
+                       size = 3, linewidth = 1,
+                       dodge = 0.5, alpha = 1, zorder = 4,
+                       ax = ax[subscapNames.index(subscap),1])
+    
+    #Remove x-axis label
+    ax[subscapNames.index(subscap),1].set_xlabel('')
+    
+    #Set x-axes tick labels if bottom row
+    if subscapNames.index(subscap) == len(subscapNames)-1:
+        #Set axis tick labels
+        ax[subscapNames.index(subscap),1].set_xticklabels(posLabels,
+                                                          fontsize = 10,
+                                                          fontweight = 'bold',
+                                                          rotation = 45,
+                                                          ha = 'right')
+    else:
+        #Remove tick labels
+        ax[subscapNames.index(subscap),1].set_xticklabels([])
+        
+    #Set title
+    ax[subscapNames.index(subscap),1].set_title(subscapLabels[subscapNames.index(subscap)],
+                                                fontsize = 12, fontweight = 'bold')
+    
+    #Set y-axis label
+    ax[subscapNames.index(subscap),1].set_ylabel('Moment Arm (mm)\n(\u2190Int. Rot. / Ext. Rot.\u2192)',
+                                                 fontsize = 10, fontweight = 'bold')
+    
+    #Add 'zero' line
+    ax[subscapNames.index(subscap),1].axhline(y = 0,
+                                              color = 'lightgrey',
+                                              linewidth = 1, linestyle = '--',
+                                              zorder = 0)
+    
+    #Remove legend
+    ax[subscapNames.index(subscap),1].get_legend().remove()
+    
+    #Set y-axis limit to max and minimum values in dataset for plane
+    #Add a buffer of 10%
+    ax[subscapNames.index(subscap),1].set_ylim([maMin_TP - (maMax_TP*0.1),
+                                                maMax_TP + (maMax_TP*0.1)])
+    
+#Tight layout
+plt.tight_layout()
+
+#Save figure
+fig.savefig('..\\Results\\Figures\\ma_Fig.png', dpi = 300, format = 'png')
+
+#Close figure
+plt.close()
 
 # %% OLD TEST CODE BELOW...
 
