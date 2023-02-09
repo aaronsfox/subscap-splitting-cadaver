@@ -47,23 +47,29 @@ S7
 - Some serious posterior translation in ABER and APP in TP
 - Worked out mini sphere size based on its size relative to larger sphere in corresponding images to set TP phantom
 
+S8
+- Listed as left but from TP images could be right?
+- Seems like significant inferior subluxation in SP?
+
 S9
 - Bit of movement in camera from initial 0abd 0N to 20N, re-did GP
-- Significant rotation of field of view in 90 abduction --- might this cause issues with analysis calculations as it's not the same orientation as others in SP? Was consistent with this field of view from 90abd onwards
+- Significant rotation of field of view in 90 abduction --- might this cause issues with analysis calculations as it's not the same orientation as others in SP? Was consistent with this field of view from 90abd onwards --- seems OK...
 - Not easy to identify glenoid plane in TP images
 
 
 
 *GP*
-S1 - 0abd 0N SP; 0abd 0N TP
-S2 - 0abd 0N SP; 90abd 40N TP [almost impossible to identify glenoid plane in TP images]
-S3 - 90abd 0N SP; 90abd 0N TP
-S4 - 0abd 0N SP; 90abd 0N TP
-S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note]
-S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 20N SP +++ ABER 40N SP +++ APP 0N SP
-S7 - 0abd 0N TP; all in SP as poor points available for registration/too much movement
-S9 - 0abd 0N SP +++ 0abd 20N SP +++ 90abd 0N SP; 0abd 0N TP [check on APP 40N TP when processing - should be a good match to check as it was somewhat better visibility]
+S1 - 0abd 0N SP; 0abd 0N TP [*ALL GOOD*]
+S2 - 0abd 0N SP; 90abd 40N TP [*ALL GOOD*]
+S3 - 90abd 0N SP; 90abd 0N TP [*ALL GOOD*]
+S4 - 0abd 0N SP; 90abd 0N TP [*ALL GOOD*]
+S5 - 0abd 0N SP +++ 90abd 0N SP; 0abd 0N TP +++ 90abd 0N TP +++ ABER 0N TP [see note] [*ALL GOOD*]
+S6 - 0abd 0N SP/TP +++ 90abd 0N SP +++ ABER 0N SP +++ ABER 20N SP +++ ABER 40N SP +++ APP 0N SP [*ALL GOOD*]
+S7 - 0abd 0N TP; all in SP as poor points available for registration/too much movement [*ALL GOOD*]
+S9 - 0abd 0N SP +++ 0abd 20N SP +++ 90abd 0N SP; 0abd 0N TP [*ALL GOOD*]
 
+***** Note on GP *****
+There are some linering estimated glenoid fit data in certain folders from initial analysis runs - i.e. they were bad, the glenoid plane was re-defined for that image, but the estimation data isn't deleted. Could create a quick pipeline that deletes any of the glenoid plane estimate data if the gp.csv file is present.
 
 
 *PHANTOMS*
@@ -95,19 +101,19 @@ S3+ - spring/cyclinder (SS1), none (SS2), big sphere (SS3), small sphere (SS4)
 
 
 *PROCESSED*
-*Below only for 50% split*
-- S1 0N and 40N, SP and TP for every position
-- S2 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S3 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S4 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S5 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S6 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP
-- S7 0N and 40N, SP and TP for 0abd, 90abd, ABER, APP [no 40N APP for TP]
+- S1 [*done for 50%*]
+- S2 [*done for 50%*]
+- S3 [*done for 50%*]
+- S4 [*done for 50%*]
+- S5 [*done for 50%*]
+- S6 [*done for 50%*]
+- S7 [*done for 50%*]
+- S9 [*done for 50%*]
 
 *DOWNLOAD LINKS*
 - S1 = https://drive.google.com/file/d/1VLKyEkgHoHZ-dg8y4Qvmr7OMiwPU6m_e/view?usp=sharing
 - S2 = https://drive.google.com/file/d/19y5fVNQEPB2UuxoXKm1PFKydW4UOr13p/view?usp=sharing
 - S3 = https://drive.google.com/file/d/1b8vb_i3v1x-0u_okKwlYyo3ek9L_chbP/view?usp=sharing
 - S4,5,6,7 = https://drive.google.com/file/d/1AzoukrWuHeCaQ97cqOBFWW2dZEJXDO8y/view?usp=sharing
-- S8 = ???
+- S8 = https://drive.google.com/file/d/1ISMbMSdPy4PllaiZV3rAkerb1yjLH0AQ/view?usp=sharing
 - S9 = https://drive.google.com/file/d/1HRPyhSs4utZaaGSPCc8aUfB8ymZRJTaE/view?usp=sharing
