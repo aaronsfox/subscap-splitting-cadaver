@@ -35,10 +35,10 @@ from shutil import copy2, rmtree
 ##### ----- CHECK AND CHANGE THESE PARAMETERS EACH RUN ----- #####
 
 #Specimen to analyse
-specimen = 'S4_l' #specimen number and label for limb tested
+specimen = 'S1_r' #specimen number and label for limb tested
 
 #Latarjet condition to analyse
-latarjetCond = 'split50' #split50, split25_upper, split25_lower
+latarjetCond = 'split25_lower' #split50, split25_upper, split25_lower
 
 #Set phantom type
 phantomType_SP = 'sphere' #sphere, toroid
@@ -1150,7 +1150,10 @@ for currDir in dirList:
         # %% Import data
         
         #Identify the processed .tif file
-        imageFile = glob('*_proc.tif')[0]
+        try:
+            imageFile = glob('*_proc.tif')[0]
+        except:
+            imageFile = glob('*.tif')[0]
         
         #Load image
         img = io.imread(imageFile)
