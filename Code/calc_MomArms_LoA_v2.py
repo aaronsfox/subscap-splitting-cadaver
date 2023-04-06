@@ -41,10 +41,10 @@ from shutil import copy2, rmtree
 ##### ----- CHECK AND CHANGE THESE PARAMETERS EACH RUN ----- #####
 
 #Specimen to analyse
-specimen = 'S1_r' #specimen number and label for limb tested
+specimen = 'S9_l' #specimen number and label for limb tested
 
 #Latarjet condition to analyse
-latarjetCond = 'split25_upper' #split50, split25_upper, split25_lower
+latarjetCond = 'split25_lower' #split50, split25_upper, split25_lower
 
 #Set phantom type
 phantomType_SP = 'sphere' #sphere, toroid
@@ -941,19 +941,19 @@ for currDir in dirList:
 dirList_SP = [ii for ii in useDirList if '_SP_' in ii]
 dirList_TP = [ii for ii in useDirList if '_TP_' in ii]
 
-#Create the dictionary that maps the need for estimating glenoid plane
-estGlenoidPlane = {'S1_r': {'split25_upper': {'TP': {'abd0': ['0N', '20N', '40N']}}},
-                   'S2_r': {'split25_lower': {'SP': {'abd0': ['0N', '20N', '40N'],
-                                                     'abd90': ['0N', '20N', '40N']}}},
-                   'S7_r': {'split25_upper': {'SP': {'abd0': ['0N', '20N', '40N'],
-                                                     'abd90': ['0N', '20N', '40N']}}},
-                   }
+# #Create the dictionary that maps the need for estimating glenoid plane
+# estGlenoidPlane = {'S1_r': {'split25_upper': {'TP': {'abd0': ['0N', '20N', '40N']}}},
+#                    'S2_r': {'split25_lower': {'SP': {'abd0': ['0N', '20N', '40N'],
+#                                                      'abd90': ['0N', '20N', '40N']}}},
+#                    'S7_r': {'split25_upper': {'SP': {'abd0': ['0N', '20N', '40N'],
+#                                                      'abd90': ['0N', '20N', '40N']}}},
+#                    }
 
-#Create a dictionary that maps the condition with the reference points
-ptsGlenoidPlane = {'S1_r': {'split25_upper': {'TP': {'APP': '20N'}}},
-                   'S2_r': {'split25_lower': {'SP': {'APP': '10N'}}},
-                   'S7_r': {'split25_upper': {'TP': {'ABER': '0N'}}}
-                   }
+# #Create a dictionary that maps the condition with the reference points
+# ptsGlenoidPlane = {'S1_r': {'split25_upper': {'TP': {'APP': '20N'}}},
+#                    'S2_r': {'split25_lower': {'SP': {'APP': '10N'}}},
+#                    'S7_r': {'split25_upper': {'TP': {'ABER': '0N'}}}
+#                    }
 
 # %% Create scaling factor based on phantom size
     
@@ -1143,103 +1143,104 @@ for currDir in useDirList:
         hhCentreX, hhCentreY, hhRadius = fitCircle(hhPoints['X'].to_numpy(),
                                                    hhPoints['Y'].to_numpy())
         
-        #Glenoid plane
-        #Check if this condition requires plane estimation
-        try:
-            estGlenoidPlane[specimen][latarjetCond][currPlaneName.replace('_','')][currPosName]
-            estPlane = True
-        except:
-            estPlane = False
+        # #Glenoid plane
+        # #Check if this condition requires plane estimation
+        # try:
+        #     estGlenoidPlane[specimen][latarjetCond][currPlaneName.replace('_','')][currPosName]
+        #     estPlane = True
+        # except:
+        #     estPlane = False
         
-        #Calculate glenoind plane
-        if not estPlane:
+        # #Calculate glenoind plane
+        # if not estPlane:
             
-            #Simply load in glenoid points
-            gpPoints = pd.read_csv('gp.csv')
+        #### NOTE: all glenoid planes digitised for upper and lower splits...
+        #Simply load in glenoid points
+        gpPoints = pd.read_csv('gp.csv')
             
-        else:
+        # else:
             
-            #Find the directories that meet the conditions specified for estimating the points
-            ptsPlane = list(ptsGlenoidPlane[specimen][latarjetCond].keys())[0]
-            ptsPos = list(ptsGlenoidPlane[specimen][latarjetCond][ptsPlane].keys())[0]
-            ptsLoad = ptsGlenoidPlane[specimen][latarjetCond][ptsPlane][ptsPos]
+        #     #Find the directories that meet the conditions specified for estimating the points
+        #     ptsPlane = list(ptsGlenoidPlane[specimen][latarjetCond].keys())[0]
+        #     ptsPos = list(ptsGlenoidPlane[specimen][latarjetCond][ptsPlane].keys())[0]
+        #     ptsLoad = ptsGlenoidPlane[specimen][latarjetCond][ptsPlane][ptsPos]
             
-            #Find directories that contain all of these conditions
-            os.chdir('..')
-            ptsDir = []
-            for checkDir in dirList:
-                #Check plane position and load
-                if '_'+ptsPlane in checkDir and ptsPos in checkDir and '_'+ptsLoad in checkDir:
-                    #Navigate into directory and see if pts file is present
-                    os.chdir(checkDir)
-                    if len(glob('pts.csv')) > 0:                    
-                        #Append to list
-                        ptsDir.append(checkDir)
-                    #Navigate back up
-                    os.chdir('..')
+        #     #Find directories that contain all of these conditions
+        #     os.chdir('..')
+        #     ptsDir = []
+        #     for checkDir in dirList:
+        #         #Check plane position and load
+        #         if '_'+ptsPlane in checkDir and ptsPos in checkDir and '_'+ptsLoad in checkDir:
+        #             #Navigate into directory and see if pts file is present
+        #             os.chdir(checkDir)
+        #             if len(glob('pts.csv')) > 0:                    
+        #                 #Append to list
+        #                 ptsDir.append(checkDir)
+        #             #Navigate back up
+        #             os.chdir('..')
             
-            #Get and check points directory
-            if len(ptsDir) > 1:
-                raise ValueError('More than 1 reference points directory identified')
-            else:
-                #Get the data for the reference
-                os.chdir(ptsDir[0])
-                estPts = pd.read_csv('pts.csv')
-                estGp = pd.read_csv('gp.csv')
-                try:
-                    refImgFile = glob('*_proc.tif')[0]
-                except:
-                    refImgFile = glob('*.tif')[0]
-                refImg = io.imread(refImgFile)
-                os.chdir('..')
+        #     #Get and check points directory
+        #     if len(ptsDir) > 1:
+        #         raise ValueError('More than 1 reference points directory identified')
+        #     else:
+        #         #Get the data for the reference
+        #         os.chdir(ptsDir[0])
+        #         estPts = pd.read_csv('pts.csv')
+        #         estGp = pd.read_csv('gp.csv')
+        #         try:
+        #             refImgFile = glob('*_proc.tif')[0]
+        #         except:
+        #             refImgFile = glob('*.tif')[0]
+        #         refImg = io.imread(refImgFile)
+        #         os.chdir('..')
             
-            #Estimate glenoid plane based on image transformation
-            os.chdir(currDir)
+        #     #Estimate glenoid plane based on image transformation
+        #     os.chdir(currDir)
             
-            #Import the digitised reference points from the current image
-            refPts = pd.read_csv('pts.csv')
+        #     #Import the digitised reference points from the current image
+        #     refPts = pd.read_csv('pts.csv')
 
-            #Set points to transform
-            transDigPts = np.transpose(np.array([refPts['X'].to_numpy(),
-                                                 refPts['Y'].to_numpy()]))
-            refDigPts = np.transpose(np.array([estPts['X'].to_numpy(),
-                                               estPts['Y'].to_numpy()]))
+        #     #Set points to transform
+        #     transDigPts = np.transpose(np.array([refPts['X'].to_numpy(),
+        #                                          refPts['Y'].to_numpy()]))
+        #     refDigPts = np.transpose(np.array([estPts['X'].to_numpy(),
+        #                                        estPts['Y'].to_numpy()]))
                 
-            #Apply procrustes algorithm
-            resErr, newPts, tform = procrustes(refDigPts, transDigPts)
+        #     #Apply procrustes algorithm
+        #     resErr, newPts, tform = procrustes(refDigPts, transDigPts)
             
-            #Apply the transformation to the reference glenoid plane points
-            gpPts = np.transpose(np.array([estGp['X'].to_numpy(),
-                                           estGp['Y'].to_numpy()]))
+        #     #Apply the transformation to the reference glenoid plane points
+        #     gpPts = np.transpose(np.array([estGp['X'].to_numpy(),
+        #                                    estGp['Y'].to_numpy()]))
             
-            #Transform reference glenoid points to new array
-            gpPts_trans = np.zeros(gpPts.shape)
-            for pp in range(gpPts.shape[0]):
-                gpPts_trans[pp] = tform['rotation'].dot(gpPts[pp]) - tform['translation']
+        #     #Transform reference glenoid points to new array
+        #     gpPts_trans = np.zeros(gpPts.shape)
+        #     for pp in range(gpPts.shape[0]):
+        #         gpPts_trans[pp] = tform['rotation'].dot(gpPts[pp]) - tform['translation']
                 
-            #Visualise new points on image alongside point alignment comparison
-            visGlenoidFit()
-            #Save figure
-            plt.savefig('estimatedGlenoidPlaneFit.png', format = 'png', dpi = 300)
-            #Close figure
-            plt.close()
+        #     #Visualise new points on image alongside point alignment comparison
+        #     visGlenoidFit()
+        #     #Save figure
+        #     plt.savefig('estimatedGlenoidPlaneFit.png', format = 'png', dpi = 300)
+        #     #Close figure
+        #     plt.close()
             
-            ##### FIX BELOW TO USE A ENSURE APPROPRIATE DATA SAVE ... #####
+        #     ##### FIX BELOW TO USE A ENSURE APPROPRIATE DATA SAVE ... #####
             
-            #Convert fitted glenoid plane to same dataframe format as digitised
-            gpPoints = pd.DataFrame(gpPts_trans, columns = ['X','Y'])
+        #     #Convert fitted glenoid plane to same dataframe format as digitised
+        #     gpPoints = pd.DataFrame(gpPts_trans, columns = ['X','Y'])
             
-            #Print out residual error to folder for reference
-            with open('glenoidPlaneFit_resErr.txt', 'w') as f:
-                if 'SP' in currPlaneName:
-                    val = resErr / phantomScale_SP
-                    f.write('%f' % val)
-                elif 'TP' in currPlaneName:
-                    val = resErr / phantomScale_TP
-                    f.write('%f' % val)
-            f.close()
+        #     #Print out residual error to folder for reference
+        #     with open('glenoidPlaneFit_resErr.txt', 'w') as f:
+        #         if 'SP' in currPlaneName:
+        #             val = resErr / phantomScale_SP
+        #             f.write('%f' % val)
+        #         elif 'TP' in currPlaneName:
+        #             val = resErr / phantomScale_TP
+        #             f.write('%f' % val)
+        #     f.close()
             
-            ##### FIX ABOVE TO USE A DICTIONARY LOOK-UP #####
+        #     ##### FIX ABOVE TO USE A DICTIONARY LOOK-UP #####
 
         # %% Visualise digitisations
         
