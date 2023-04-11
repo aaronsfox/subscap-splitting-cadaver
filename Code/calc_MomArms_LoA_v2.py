@@ -254,29 +254,31 @@ def visDigitised():
         extendX = hhCentreX + ((img.shape[1] - hhCentreX) / 2)
     #Loop through points
     for ss in range(len(subscapNames)):
-        #Plot points
-        plt.scatter(subscapPoints[subscapNames[ss]]['X'],
-                    subscapPoints[subscapNames[ss]]['Y'],
-                    s = 10, c = 'red')
-        #Fit line
-        m,c = np.polyfit(subscapPoints[subscapNames[ss]]['X'],
-                         subscapPoints[subscapNames[ss]]['Y'],
-                         1)
-        #Plot fitted line
-        ax.plot(subscapPoints[subscapNames[ss]]['X'],
-                m * subscapPoints[subscapNames[ss]]['X'] + c,
-                c = 'red', lw = 1)
-        #Extend line of action
-        #Need to check which direction to extend in, and this will dictate whether
-        #to use min or max
-        if hhCentreX < np.mean(gpPoints['X']):
-            ax.plot(np.array((extendX,np.min(subscapPoints[subscapNames[ss]]['X']))),
-                    m * np.array((extendX,np.min(subscapPoints[subscapNames[ss]]['X']))) + c,
-                    c = 'red', lw = 1, ls = '--')
-        else:
-            ax.plot(np.array((np.max(subscapPoints[subscapNames[ss]]['X']),extendX)),
-                    m * np.array((np.max(subscapPoints[subscapNames[ss]]['X']),extendX)) + c,
-                    c = 'red', lw = 1, ls = '--')
+        #Check if not nan to fit the lines
+        if subscapPoints[subscapNames[ss]] is not np.nan:        
+            #Plot points
+            plt.scatter(subscapPoints[subscapNames[ss]]['X'],
+                        subscapPoints[subscapNames[ss]]['Y'],
+                        s = 10, c = 'red')
+            #Fit line
+            m,c = np.polyfit(subscapPoints[subscapNames[ss]]['X'],
+                             subscapPoints[subscapNames[ss]]['Y'],
+                             1)
+            #Plot fitted line
+            ax.plot(subscapPoints[subscapNames[ss]]['X'],
+                    m * subscapPoints[subscapNames[ss]]['X'] + c,
+                    c = 'red', lw = 1)
+            #Extend line of action
+            #Need to check which direction to extend in, and this will dictate whether
+            #to use min or max
+            if hhCentreX < np.mean(gpPoints['X']):
+                ax.plot(np.array((extendX,np.min(subscapPoints[subscapNames[ss]]['X']))),
+                        m * np.array((extendX,np.min(subscapPoints[subscapNames[ss]]['X']))) + c,
+                        c = 'red', lw = 1, ls = '--')
+            else:
+                ax.plot(np.array((np.max(subscapPoints[subscapNames[ss]]['X']),extendX)),
+                        m * np.array((np.max(subscapPoints[subscapNames[ss]]['X']),extendX)) + c,
+                        c = 'red', lw = 1, ls = '--')
         
     #Plot phantom points
     if os.path.isfile('phantom.csv'):
@@ -412,104 +414,117 @@ def calcMomentArms():
         #Turn off axes
         ax[whichAx[ss][0],whichAx[ss][1]].axis('off')
         
-        #Display humeral head points
-        ax[whichAx[ss][0],whichAx[ss][1]].scatter(hhPoints['X'], hhPoints['Y'], s = 10, c = 'green')
-        ax[whichAx[ss][0],whichAx[ss][1]].add_artist(plt.Circle((hhCentreX, hhCentreY), hhRadius,
-                                 edgecolor = 'green', facecolor = 'none'))
-        ax[whichAx[ss][0],whichAx[ss][1]].scatter(hhCentreX, hhCentreY, s = 500, c = 'green', marker = '+')
-        
-        #Display subscapularis line
-        #Plot points
-        ax[whichAx[ss][0],whichAx[ss][1]].scatter(subscapPoints[subscap]['X'],
-                                                  subscapPoints[subscap]['Y'],
-                                                  s = 10, c = 'red')
-        #Fit line
-        m,c = np.polyfit(subscapPoints[subscap]['X'],
-                         subscapPoints[subscap]['Y'],
-                         1)
-        #Plot fitted line
-        ax[whichAx[ss][0],whichAx[ss][1]].plot(subscapPoints[subscap]['X'],
-                                               m * subscapPoints[subscap]['X'] + c,
-                                               c = 'red', lw = 1)
-        #Extend line of action
-        #Check which way to extend and whether to use min or max
-        if extendX < hhCentreX:
-            ax[whichAx[ss][0],whichAx[ss][1]].plot(np.array((extendX,np.min(subscapPoints[subscap]['X']))),
-                                                   m * np.array((extendX,np.min(subscapPoints[subscap]['X']))) + c,
-                                                   c = 'red', lw = 1, ls = '--')
+        #Check if not nan first
+        if subscapPoints[subscap] is not np.nan:
+            
+            #Display humeral head points
+            ax[whichAx[ss][0],whichAx[ss][1]].scatter(hhPoints['X'], hhPoints['Y'], s = 10, c = 'green')
+            ax[whichAx[ss][0],whichAx[ss][1]].add_artist(plt.Circle((hhCentreX, hhCentreY), hhRadius,
+                                     edgecolor = 'green', facecolor = 'none'))
+            ax[whichAx[ss][0],whichAx[ss][1]].scatter(hhCentreX, hhCentreY, s = 500, c = 'green', marker = '+')
+            
+            #Display subscapularis line
+            #Plot points
+            ax[whichAx[ss][0],whichAx[ss][1]].scatter(subscapPoints[subscap]['X'],
+                                                      subscapPoints[subscap]['Y'],
+                                                      s = 10, c = 'red')
+            #Fit line
+            m,c = np.polyfit(subscapPoints[subscap]['X'],
+                             subscapPoints[subscap]['Y'],
+                             1)
+            #Plot fitted line
+            ax[whichAx[ss][0],whichAx[ss][1]].plot(subscapPoints[subscap]['X'],
+                                                   m * subscapPoints[subscap]['X'] + c,
+                                                   c = 'red', lw = 1)
+            #Extend line of action
+            #Check which way to extend and whether to use min or max
+            if extendX < hhCentreX:
+                ax[whichAx[ss][0],whichAx[ss][1]].plot(np.array((extendX,np.min(subscapPoints[subscap]['X']))),
+                                                       m * np.array((extendX,np.min(subscapPoints[subscap]['X']))) + c,
+                                                       c = 'red', lw = 1, ls = '--')
+            else:
+                ax[whichAx[ss][0],whichAx[ss][1]].plot(np.array((np.max(subscapPoints[subscap]['X']),extendX)),
+                                                       m * np.array((np.max(subscapPoints[subscap]['X']),extendX)) + c,
+                                                       c = 'red', lw = 1, ls = '--')
+                
+            #Extract two points on the line for later moment arm calculation
+            #Take the end points of the line on the x-axes
+            p1 = np.asarray((ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[0],
+                             m * ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[0] + c))
+            p2 = np.asarray((ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[1],
+                             m * ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[1] + c))
+            
+            #Calculate the point on the extended subscapularis line that is intercepted
+            #by a perpendicular line from the humerus
+            
+            #Set the points at the start and the end of the subscapularis line
+            x1 = hhCentreX/2
+            y1 = m * (hhCentreX/2)+ c
+            x2 = max(subscapPoints[subscap]['X'])
+            y2 = m * x2 + c
+            
+            #Set the humeral head point
+            x3 = hhCentreX
+            y3 = hhCentreY
+            
+            #Calculate intersecting point with perpendicular line
+            #SEE: https://stackoverflow.com/questions/1811549/perpendicular-on-a-line-from-a-given-point
+            k = ((y2-y1) * (x3-x1) - (x2-x1) * (y3-y1)) / ((y2-y1)**2 + (x2-x1)**2)
+            x4 = x3 - k * (y2-y1)
+            y4 = y3 + k * (x2-x1)
+            
+            #Plot the perpendicular line between the points
+            #This is effectively the moment arm - but only use here as visualisation
+            ax[whichAx[ss][0],whichAx[ss][1]].plot(
+                np.array((x3,x4)),np.array((y3,y4)),
+                c = 'yellow', lw = 1, ls = '--')
+            
+            #Calculate moment arm distance
+            #Includes scale by bead size
+            
+            #Old method using distance - prone to small errors
+            # ma = (math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))) / phantomScale
+            
+            #Use cross product to calculate moment arm
+            if 'SP' in currPlaneName:
+                #Check if scale value is present in dictionary
+                if currDir in list(phantomScale_SP.keys()):
+                    ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_SP[currDir]
+                else:
+                    #Use average scale value
+                    ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_SP_mean
+            elif 'TP' in currPlaneName:
+                #Check if scale value is present in dictionary
+                if currDir in list(phantomScale_TP.keys()):
+                    ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_TP[currDir]
+                else:
+                    #Use average scale value
+                    ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_TP_mean
+            
+            # #Check if moment arm is positive (abduction/IR) vs. negative (adduction/ER)
+            # #This considers proper orientation of image
+            ### Not needed with cross product approach
+            # if y3 < y4:
+            #     #Humeral head centre is above moment arm intersection
+            #     ma = ma*-1
+                
+            #Store moment arm value
+            maList.append(ma)
+            
+            #Add title with label and moment arm
+            ax[whichAx[ss][0],whichAx[ss][1]].set_title(f'{muscleTitles[ss]} / {round(ma,3)}mm',
+                                                        fontsize = 12,
+                                                        fontweight = 'bold')
+            
         else:
-            ax[whichAx[ss][0],whichAx[ss][1]].plot(np.array((np.max(subscapPoints[subscap]['X']),extendX)),
-                                                   m * np.array((np.max(subscapPoints[subscap]['X']),extendX)) + c,
-                                                   c = 'red', lw = 1, ls = '--')
             
-        #Extract two points on the line for later moment arm calculation
-        #Take the end points of the line on the x-axes
-        p1 = np.asarray((ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[0],
-                         m * ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[0] + c))
-        p2 = np.asarray((ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[1],
-                         m * ax[whichAx[ss][0],whichAx[ss][1]].get_xlim()[1] + c))
+            #Append nan to list
+            maList.append(np.nan)
         
-        #Calculate the point on the extended subscapularis line that is intercepted
-        #by a perpendicular line from the humerus
-        
-        #Set the points at the start and the end of the subscapularis line
-        x1 = hhCentreX/2
-        y1 = m * (hhCentreX/2)+ c
-        x2 = max(subscapPoints[subscap]['X'])
-        y2 = m * x2 + c
-        
-        #Set the humeral head point
-        x3 = hhCentreX
-        y3 = hhCentreY
-        
-        #Calculate intersecting point with perpendicular line
-        #SEE: https://stackoverflow.com/questions/1811549/perpendicular-on-a-line-from-a-given-point
-        k = ((y2-y1) * (x3-x1) - (x2-x1) * (y3-y1)) / ((y2-y1)**2 + (x2-x1)**2)
-        x4 = x3 - k * (y2-y1)
-        y4 = y3 + k * (x2-x1)
-        
-        #Plot the perpendicular line between the points
-        #This is effectively the moment arm - but only use here as visualisation
-        ax[whichAx[ss][0],whichAx[ss][1]].plot(
-            np.array((x3,x4)),np.array((y3,y4)),
-            c = 'yellow', lw = 1, ls = '--')
-        
-        #Calculate moment arm distance
-        #Includes scale by bead size
-        
-        #Old method using distance - prone to small errors
-        # ma = (math.sqrt(((x3 - x4)**2) + ((y3 - y4)**2))) / phantomScale
-        
-        #Use cross product to calculate moment arm
-        if 'SP' in currPlaneName:
-            #Check if scale value is present in dictionary
-            if currDir in list(phantomScale_SP.keys()):
-                ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_SP[currDir]
-            else:
-                #Use average scale value
-                ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_SP_mean
-        elif 'TP' in currPlaneName:
-            #Check if scale value is present in dictionary
-            if currDir in list(phantomScale_TP.keys()):
-                ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_TP[currDir]
-            else:
-                #Use average scale value
-                ma = np.cross(p2-p1,p3-p1) / np.linalg.norm(p2-p1) / phantomScale_TP_mean
-        
-        # #Check if moment arm is positive (abduction/IR) vs. negative (adduction/ER)
-        # #This considers proper orientation of image
-        ### Not needed with cross product approach
-        # if y3 < y4:
-        #     #Humeral head centre is above moment arm intersection
-        #     ma = ma*-1
-            
-        #Store moment arm value
-        maList.append(ma)
-        
-        #Add title with label and moment arm
-        ax[whichAx[ss][0],whichAx[ss][1]].set_title(f'{muscleTitles[ss]} / {round(ma,3)}mm',
-                                                    fontsize = 12,
-                                                    fontweight = 'bold')
+            #Add title with label and moment arm
+            ax[whichAx[ss][0],whichAx[ss][1]].set_title(f'{muscleTitles[ss]} / N.A.',
+                                                        fontsize = 12,
+                                                        fontweight = 'bold')
         
     #Set tight layout on figure
     plt.tight_layout()
@@ -522,7 +537,7 @@ def calcMomentArms():
     
     #Convert moment arm data to dataframe and export
     pd.DataFrame(list(zip(subscapNames, maList)),
-                 columns = ['subscapLine', 'momentArm']).to_csv(
+                 columns = ['subscapLine', 'momentArm']).fillna('').to_csv(
                      'momentArmData.csv',
                      index = False)
                      
@@ -551,89 +566,74 @@ def calcLoA():
         #Turn off axes labels
         imAx.axis('off')
         
-        #Display subscapularis line
-        #Plot points
-        imAx.scatter(subscapPoints[subscap]['X'],
-                     subscapPoints[subscap]['Y'],
-                     s = 5, c = 'red')
-        #Fit line
-        subscapM,subscapC = np.polyfit(subscapPoints[subscap]['X'],
-                                       subscapPoints[subscap]['Y'],
-                                       1)
-        #Plot fitted line
-        imAx.plot(subscapPoints[subscap]['X'],
-                  subscapM * subscapPoints[subscap]['X'] + subscapC,
-                  c = 'red', lw = 1)
-        #Extend line of action to min and max x-values
-        #Get current axes limits
-        retXLim = imAx.get_xlim()
-        retYLim = imAx.get_ylim()
-        #Plot lines
-        imAx.plot(np.array((retXLim[0],np.min(subscapPoints[subscap]['X']))),
-                  subscapM * np.array((retXLim[0],np.min(subscapPoints[subscap]['X']))) + subscapC,
-                  c = 'red', lw = 1, ls = '--')
-        imAx.plot(np.array((retXLim[1],np.max(subscapPoints[subscap]['X']))),
-                  subscapM * np.array((retXLim[1],np.max(subscapPoints[subscap]['X']))) + subscapC,
-                  c = 'red', lw = 1, ls = '--')
-        #Reset axes (note that axes don't seem to be changed, but here just in case)
-        imAx.set_xlim(retXLim)
-        imAx.set_ylim(retYLim)
-        
         #Add title
         imAx.set_title(muscleTitles[ss],
                        fontsize = 12, fontweight = 'bold')
         
-        #Display glenoid plane
-        imAx.scatter(gpPoints['X'], gpPoints['Y'], s = 5, c = 'yellow')
-        glenoidM,glenoidC = np.polyfit(gpPoints['X'], gpPoints['Y'], 1)
-        imAx.plot(gpPoints['X'], glenoidM * gpPoints['X'] + glenoidC, c = 'yellow', lw = 1)
-        #Extend plane to max and min of x-axis
-        imAx.plot(np.array((retXLim[0],np.min(gpPoints['X']))),
-                  glenoidM * np.array((retXLim[0],np.min(gpPoints['X']))) + glenoidC,
-                  c = 'yellow', lw = 1, ls = '--')
-        imAx.plot(np.array((retXLim[1],np.max(gpPoints['X']))),
-                  glenoidM * np.array((retXLim[1],np.max(gpPoints['X']))) + glenoidC,
-                  c = 'yellow', lw = 1, ls = '--')
+        #Check if not nan first
+        if subscapPoints[subscap] is not np.nan:
         
-        #Calculate intersect of glenoid plane and lowest subscapularis
-        #Set glenoid points as the top and bottom points
-        #Extract two points on a line fit to the glenoid plane
-        gx1 = 0
-        gx2 = 100
-        gy1 = glenoidM * gx1 + glenoidC #y-intercept; x = 0
-        gy2 = glenoidM * gx2 + glenoidC #x = 100
-        
-        #Extract two points on the subscapularis linefit
-        sx1 = 0
-        sx2 = 100
-        sy1 = subscapM * sx1 + subscapC #y-intercept; x = 0
-        sy2 = subscapM * sx2 + subscapC #x = 100
-        
-        #Calculate line intersection
-        intX, intY = lineIntersect(gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2)
-        imAx.scatter(intX, intY, c = 'blue', s = 5, zorder = 4)
-        
-        #Put a check in place to add a point to the subscap line if the points
-        #are all on the wrong side of the intercept
-        if 'SP' in currPlaneName:
+            #Display subscapularis line
+            #Plot points
+            imAx.scatter(subscapPoints[subscap]['X'],
+                         subscapPoints[subscap]['Y'],
+                         s = 5, c = 'red')
+            #Fit line
+            subscapM,subscapC = np.polyfit(subscapPoints[subscap]['X'],
+                                           subscapPoints[subscap]['Y'],
+                                           1)
+            #Plot fitted line
+            imAx.plot(subscapPoints[subscap]['X'],
+                      subscapM * subscapPoints[subscap]['X'] + subscapC,
+                      c = 'red', lw = 1)
+            #Extend line of action to min and max x-values
+            #Get current axes limits
+            retXLim = imAx.get_xlim()
+            retYLim = imAx.get_ylim()
+            #Plot lines
+            imAx.plot(np.array((retXLim[0],np.min(subscapPoints[subscap]['X']))),
+                      subscapM * np.array((retXLim[0],np.min(subscapPoints[subscap]['X']))) + subscapC,
+                      c = 'red', lw = 1, ls = '--')
+            imAx.plot(np.array((retXLim[1],np.max(subscapPoints[subscap]['X']))),
+                      subscapM * np.array((retXLim[1],np.max(subscapPoints[subscap]['X']))) + subscapC,
+                      c = 'red', lw = 1, ls = '--')
+            #Reset axes (note that axes don't seem to be changed, but here just in case)
+            imAx.set_xlim(retXLim)
+            imAx.set_ylim(retYLim)
             
-            #Check if all points are to the left of the intercept
-            if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) > 0):
-                #Calculate a point on the subscap line to the right of the intercept
-                #The makeshift X point is 5% across from the intercept relative
-                #to the maximum of the X axis                
-                makeshiftX = intX + (imAx.get_xlim()[1] - intX) * 0.05
-                makeshiftY = subscapM * makeshiftX + subscapC
-                #Plot the point
-                imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
-                #Add this point to the current subscapularis line for calculations
-                subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
-                                                                        'Y': makeshiftY},
-                                                                       ignore_index = True)  
-                
-        elif 'TP' in currPlaneName:
+            #Display glenoid plane
+            imAx.scatter(gpPoints['X'], gpPoints['Y'], s = 5, c = 'yellow')
+            glenoidM,glenoidC = np.polyfit(gpPoints['X'], gpPoints['Y'], 1)
+            imAx.plot(gpPoints['X'], glenoidM * gpPoints['X'] + glenoidC, c = 'yellow', lw = 1)
+            #Extend plane to max and min of x-axis
+            imAx.plot(np.array((retXLim[0],np.min(gpPoints['X']))),
+                      glenoidM * np.array((retXLim[0],np.min(gpPoints['X']))) + glenoidC,
+                      c = 'yellow', lw = 1, ls = '--')
+            imAx.plot(np.array((retXLim[1],np.max(gpPoints['X']))),
+                      glenoidM * np.array((retXLim[1],np.max(gpPoints['X']))) + glenoidC,
+                      c = 'yellow', lw = 1, ls = '--')
             
-            if specimen.split('_')[1] == 'l':
+            #Calculate intersect of glenoid plane and lowest subscapularis
+            #Set glenoid points as the top and bottom points
+            #Extract two points on a line fit to the glenoid plane
+            gx1 = 0
+            gx2 = 100
+            gy1 = glenoidM * gx1 + glenoidC #y-intercept; x = 0
+            gy2 = glenoidM * gx2 + glenoidC #x = 100
+            
+            #Extract two points on the subscapularis linefit
+            sx1 = 0
+            sx2 = 100
+            sy1 = subscapM * sx1 + subscapC #y-intercept; x = 0
+            sy2 = subscapM * sx2 + subscapC #x = 100
+            
+            #Calculate line intersection
+            intX, intY = lineIntersect(gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2)
+            imAx.scatter(intX, intY, c = 'blue', s = 5, zorder = 4)
+            
+            #Put a check in place to add a point to the subscap line if the points
+            #are all on the wrong side of the intercept
+            if 'SP' in currPlaneName:
                 
                 #Check if all points are to the left of the intercept
                 if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) > 0):
@@ -647,151 +647,157 @@ def calcLoA():
                     #Add this point to the current subscapularis line for calculations
                     subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
                                                                             'Y': makeshiftY},
-                                                                           ignore_index = True)
+                                                                           ignore_index = True)  
                     
-            elif specimen.split('_')[1] == 'r':
+            elif 'TP' in currPlaneName:
                 
-                #Check if all points are to the left of the intercept
-                if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) < 0):
-                    #Calculate a point on the subscap line to the right of the intercept
-                    #The makeshift X point is 5% across from the intercept relative
-                    #to the maximum of the X axis                
-                    makeshiftX = intX - (intX - imAx.get_xlim()[0]) * 0.05
-                    makeshiftY = subscapM * makeshiftX + subscapC
-                    #Plot the point
-                    imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
-                    #Add this point to the current subscapularis line for calculations
-                    subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
-                                                                            'Y': makeshiftY},
-                                                                           ignore_index = True)
-        
-        #Determine slope (i.e. negative reciprocal) of perpendicular line to glenoid plane
-        mPerp = 1 / (-glenoidM)
-        
-        #Solve for y-intercept if scapular plane
-        if 'SP' in currPlaneName:            
-            #Solve for y-intercept of new line
-            #Use intercept points for line
-            cPerp = (mPerp * intX - intY) * -1
-            #Visualise
-            imAx.plot([0,intX], [cPerp, intY], c = 'blue', lw = 1, ls = '--')
-        #Solve for y at maximum or minimum X if transverse plane
-        #Depends on if left or right limb for specimen
-        elif 'TP' in currPlaneName:
-            if specimen.split('_')[1] == 'r':
-                #Solver for y at maximum x-value
-                cPerp = (mPerp * intX - intY) * -1
-                cMax = mPerp * img.shape[1] + cPerp
-                #Visualise
-                imAx.plot([intX, img.shape[1]], [intY, cMax], c = 'blue', lw = 1, ls = '--')
-            elif specimen.split('_')[1] == 'l':
+                if specimen.split('_')[1] == 'l':
+                    
+                    #Check if all points are to the left of the intercept
+                    if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) > 0):
+                        #Calculate a point on the subscap line to the right of the intercept
+                        #The makeshift X point is 5% across from the intercept relative
+                        #to the maximum of the X axis                
+                        makeshiftX = intX + (imAx.get_xlim()[1] - intX) * 0.05
+                        makeshiftY = subscapM * makeshiftX + subscapC
+                        #Plot the point
+                        imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
+                        #Add this point to the current subscapularis line for calculations
+                        subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
+                                                                                'Y': makeshiftY},
+                                                                               ignore_index = True)
+                        
+                elif specimen.split('_')[1] == 'r':
+                    
+                    #Check if all points are to the left of the intercept
+                    if np.all((intX - subscapPoints[subscap]['X'].to_numpy()) < 0):
+                        #Calculate a point on the subscap line to the right of the intercept
+                        #The makeshift X point is 5% across from the intercept relative
+                        #to the maximum of the X axis                
+                        makeshiftX = intX - (intX - imAx.get_xlim()[0]) * 0.05
+                        makeshiftY = subscapM * makeshiftX + subscapC
+                        #Plot the point
+                        imAx.scatter(makeshiftX, makeshiftY, c = 'red', s = 5, zorder = 4)
+                        #Add this point to the current subscapularis line for calculations
+                        subscapPoints[subscap] = subscapPoints[subscap].append({'X': makeshiftX,
+                                                                                'Y': makeshiftY},
+                                                                               ignore_index = True)
+            
+            #Determine slope (i.e. negative reciprocal) of perpendicular line to glenoid plane
+            mPerp = 1 / (-glenoidM)
+            
+            #Solve for y-intercept if scapular plane
+            if 'SP' in currPlaneName:            
                 #Solve for y-intercept of new line
                 #Use intercept points for line
                 cPerp = (mPerp * intX - intY) * -1
                 #Visualise
                 imAx.plot([0,intX], [cPerp, intY], c = 'blue', lw = 1, ls = '--')
-        
-        #To calculate the line of action we revert to a standard lower left origin
-        #compared to the upper left origin of the images --- therefore we can work
-        #more easily by converting the data points to this coordinate system
-        #Note that only the y coordinates need to change
-        #Glenoid points
-        gpPointsFlipX = gpPoints['X']
-        gpPointsFlipY = img.shape[0] - gpPoints['Y']
-        #Intersect point
-        intFlipX = intX
-        intFlipY = img.shape[0] - intY
-        #Subscapularis points
-        ssPointsFlipX = subscapPoints[subscapNames[ss]]['X']
-        ssPointsFlipY = img.shape[0] - subscapPoints[subscapNames[ss]]['Y']
-        
-        #Reorient the data points so that the glenoid plane = y-axis and the perpendicular
-        #line = x-axis
-        
-        #Recalculate glenoid plane gradient with flipped coordinates
-        glenoidFlipM = np.polyfit(gpPointsFlipX, gpPointsFlipY, 1)[0]
+            #Solve for y at maximum or minimum X if transverse plane
+            #Depends on if left or right limb for specimen
+            elif 'TP' in currPlaneName:
+                if specimen.split('_')[1] == 'r':
+                    #Solver for y at maximum x-value
+                    cPerp = (mPerp * intX - intY) * -1
+                    cMax = mPerp * img.shape[1] + cPerp
+                    #Visualise
+                    imAx.plot([intX, img.shape[1]], [intY, cMax], c = 'blue', lw = 1, ls = '--')
+                elif specimen.split('_')[1] == 'l':
+                    #Solve for y-intercept of new line
+                    #Use intercept points for line
+                    cPerp = (mPerp * intX - intY) * -1
+                    #Visualise
+                    imAx.plot([0,intX], [cPerp, intY], c = 'blue', lw = 1, ls = '--')
             
-        #Determine angle to rotate clockwise about intersection point based on
-        #glenoid plane gradient
-        #Negative gradient needs to be rotated clockwise by 90 - degrees
-        if glenoidFlipM < 0:
-            #Convert gradient to radians
-            rotAng = np.radians(90) - np.arctan(glenoidM)
-        elif glenoidFlipM > 0:
-            #Convert gradient to radians
-            rotAng = (np.radians(90) + np.arctan(glenoidM)) * -1
-        elif glenoidFlipM == 0:
-            #90 degree rotation required
-            rotAng = np.radians(90)
-        
-        #Rotate the current subscapularis points clockwise by the prescribed degrees
-        #Origin is the intersection point
-        rx = []
-        ry = []
-        for nn in range(len(ssPointsFlipX)):
-            #Set current point
-            #Convert to 0,0 origin here too
-            px = ssPointsFlipX[nn] - intFlipX
-            py = ssPointsFlipY[nn] - intFlipY
-            #Rotate about 0,0 origin by specified angle
-            #Append to list here too
-            rx.append(px * math.cos(rotAng) + py * math.sin(rotAng))
-            ry.append(-px * math.sin(rotAng) + py * math.cos(rotAng))
+            #To calculate the line of action we revert to a standard lower left origin
+            #compared to the upper left origin of the images --- therefore we can work
+            #more easily by converting the data points to this coordinate system
+            #Note that only the y coordinates need to change
+            #Glenoid points
+            gpPointsFlipX = gpPoints['X']
+            gpPointsFlipY = img.shape[0] - gpPoints['Y']
+            #Intersect point
+            intFlipX = intX
+            intFlipY = img.shape[0] - intY
+            #Subscapularis points
+            ssPointsFlipX = subscapPoints[subscapNames[ss]]['X']
+            ssPointsFlipY = img.shape[0] - subscapPoints[subscapNames[ss]]['Y']
+            
+            #Reorient the data points so that the glenoid plane = y-axis and the perpendicular
+            #line = x-axis
+            
+            #Recalculate glenoid plane gradient with flipped coordinates
+            glenoidFlipM = np.polyfit(gpPointsFlipX, gpPointsFlipY, 1)[0]
                 
-        #Visualise rotated points on new subplots
-        lnAx = plt.subplot2grid((8,8), (ss*2,4), rowspan = 2, colspan = 4)
-    
-        #Plot subscapularis points and origin
-        lnAx.scatter(rx, ry, s = 15, c = 'red')
-        lnAx.scatter(0, 0, s = 30, c = 'black')
+            #Determine angle to rotate clockwise about intersection point based on
+            #glenoid plane gradient
+            #Negative gradient needs to be rotated clockwise by 90 - degrees
+            if glenoidFlipM < 0:
+                #Convert gradient to radians
+                rotAng = np.radians(90) - np.arctan(glenoidM)
+            elif glenoidFlipM > 0:
+                #Convert gradient to radians
+                rotAng = (np.radians(90) + np.arctan(glenoidM)) * -1
+            elif glenoidFlipM == 0:
+                #90 degree rotation required
+                rotAng = np.radians(90)
+            
+            #Rotate the current subscapularis points clockwise by the prescribed degrees
+            #Origin is the intersection point
+            rx = []
+            ry = []
+            for nn in range(len(ssPointsFlipX)):
+                #Set current point
+                #Convert to 0,0 origin here too
+                px = ssPointsFlipX[nn] - intFlipX
+                py = ssPointsFlipY[nn] - intFlipY
+                #Rotate about 0,0 origin by specified angle
+                #Append to list here too
+                rx.append(px * math.cos(rotAng) + py * math.sin(rotAng))
+                ry.append(-px * math.sin(rotAng) + py * math.cos(rotAng))
+                    
+            #Visualise rotated points on new subplots
+            lnAx = plt.subplot2grid((8,8), (ss*2,4), rowspan = 2, colspan = 4)
         
-        #Square up axes based on maximum value across the current axes limits
-        #Get axes limits
-        lnXLim = lnAx.get_xlim()
-        lnYLim = lnAx.get_ylim()
-        #Find absolute maximum of all values
-        maxLim = np.max(np.array([np.abs(lnXLim),np.abs(lnYLim)]))
-        #Set axes to square using maximum value
-        lnAx.set_xlim([maxLim*-1,maxLim])
-        lnAx.set_ylim([maxLim*-1,maxLim])
-    
-        #Create axes lines scaled to axes lengths
-        if 'SP' in currPlaneName:
-            lnAx.plot([0,maxLim/2*-1], [0,0], lw = 2, c = 'black') #x-axis
-        elif 'TP' in currPlaneName:
-            #Direction depends on specimen limb
-            if specimen.split('_')[1] == 'r':
-                lnAx.plot([0,maxLim/2], [0,0], lw = 2, c = 'black') #x-axis
-            elif specimen.split('_')[1] == 'l':
+            #Plot subscapularis points and origin
+            lnAx.scatter(rx, ry, s = 15, c = 'red')
+            lnAx.scatter(0, 0, s = 30, c = 'black')
+            
+            #Square up axes based on maximum value across the current axes limits
+            #Get axes limits
+            lnXLim = lnAx.get_xlim()
+            lnYLim = lnAx.get_ylim()
+            #Find absolute maximum of all values
+            maxLim = np.max(np.array([np.abs(lnXLim),np.abs(lnYLim)]))
+            #Set axes to square using maximum value
+            lnAx.set_xlim([maxLim*-1,maxLim])
+            lnAx.set_ylim([maxLim*-1,maxLim])
+        
+            #Create axes lines scaled to axes lengths
+            if 'SP' in currPlaneName:
                 lnAx.plot([0,maxLim/2*-1], [0,0], lw = 2, c = 'black') #x-axis
-        lnAx.plot([0,0], [0,maxLim/2], lw = 2, c = 'black') #y-axis
+            elif 'TP' in currPlaneName:
+                #Direction depends on specimen limb
+                if specimen.split('_')[1] == 'r':
+                    lnAx.plot([0,maxLim/2], [0,0], lw = 2, c = 'black') #x-axis
+                elif specimen.split('_')[1] == 'l':
+                    lnAx.plot([0,maxLim/2*-1], [0,0], lw = 2, c = 'black') #x-axis
+            lnAx.plot([0,0], [0,maxLim/2], lw = 2, c = 'black') #y-axis
+            
+            #Fit muscle line
+            rotM, rotC = np.polyfit(rx, ry, 1)
+            lnAx.plot(np.array(rx), rotM * np.array(rx) + rotC, c = 'red', lw = 1, zorder = 0)
+            #Extend to origin
+            lnAx.plot(np.array((0,np.min(rx))),
+                      rotM * np.array((0,np.min(rx))) + rotC,
+                      c = 'red', lw = 1, ls = '--', zorder = 0)
+                    
+            #Turn off axes labels
+            lnAx.axis('off')
         
-        #Fit muscle line
-        rotM, rotC = np.polyfit(rx, ry, 1)
-        lnAx.plot(np.array(rx), rotM * np.array(rx) + rotC, c = 'red', lw = 1, zorder = 0)
-        #Extend to origin
-        lnAx.plot(np.array((0,np.min(rx))),
-                  rotM * np.array((0,np.min(rx))) + rotC,
-                  c = 'red', lw = 1, ls = '--', zorder = 0)
-                
-        #Turn off axes labels
-        lnAx.axis('off')
-    
-        #Convert gradient of line to angle in degrees
-        #Scapular plane calculations
-        if 'SP' in currPlaneName:
-            if rotM > 0:
-                lineOfAction = 180 + np.degrees(np.arctan(rotM))
-            elif rotM < 0:
-                #Inferiorly directed line of action (i.e. < 180 degrees)
-                lineOfAction = 180 - (np.degrees(np.arctan(rotM))*-1)
-            elif rotM == 0:
-                #180 degree (i.e. straight compression) line of action
-                lineOfAction = 180
-        #Transverse plane calculations
-        elif 'TP' in currPlaneName:
-            #Calculations depend on specimen limb
-            if specimen.split('_')[1] == 'r':
+            #Convert gradient of line to angle in degrees
+            #Scapular plane calculations
+            if 'SP' in currPlaneName:
                 if rotM > 0:
                     lineOfAction = 180 + np.degrees(np.arctan(rotM))
                 elif rotM < 0:
@@ -800,64 +806,82 @@ def calcLoA():
                 elif rotM == 0:
                     #180 degree (i.e. straight compression) line of action
                     lineOfAction = 180
-                    
-            elif specimen.split('_')[1] == 'l':
-                if rotM > 0:
-                    lineOfAction = 180 - np.degrees(np.arctan(rotM))
-                elif rotM < 0:
-                    #Inferiorly directed line of action (i.e. < 180 degrees)
-                    lineOfAction = 180 + (np.degrees(np.arctan(rotM))*-1)
-                elif rotM == 0:
-                    #180 degree (i.e. straight compression) line of action
-                    lineOfAction = 180
-                    
-        #Print line of action in top left corner of axes
-        lnAx.text(0.025, 0.9,
-                  'LoA = '+str(np.round(lineOfAction,2))+u'\u00b0',
-                  ha = 'left', va = 'center', transform = lnAx.transAxes)
-        
-        #Store current LoA calculation in list
-        loaList.append(lineOfAction)
-        
-        #Calculate stability ratio
-        
-        #Set a point at the end of the line of action
-        #If this is in the scapular plane, we'll use the max x-limit
-        if 'SP' in currPlaneName:
+            #Transverse plane calculations
+            elif 'TP' in currPlaneName:
+                #Calculations depend on specimen limb
+                if specimen.split('_')[1] == 'r':
+                    if rotM > 0:
+                        lineOfAction = 180 + np.degrees(np.arctan(rotM))
+                    elif rotM < 0:
+                        #Inferiorly directed line of action (i.e. < 180 degrees)
+                        lineOfAction = 180 - (np.degrees(np.arctan(rotM))*-1)
+                    elif rotM == 0:
+                        #180 degree (i.e. straight compression) line of action
+                        lineOfAction = 180
+                        
+                elif specimen.split('_')[1] == 'l':
+                    if rotM > 0:
+                        lineOfAction = 180 - np.degrees(np.arctan(rotM))
+                    elif rotM < 0:
+                        #Inferiorly directed line of action (i.e. < 180 degrees)
+                        lineOfAction = 180 + (np.degrees(np.arctan(rotM))*-1)
+                    elif rotM == 0:
+                        #180 degree (i.e. straight compression) line of action
+                        lineOfAction = 180
+                        
+            #Print line of action in top left corner of axes
+            lnAx.text(0.025, 0.9,
+                      'LoA = '+str(np.round(lineOfAction,2))+u'\u00b0',
+                      ha = 'left', va = 'center', transform = lnAx.transAxes)
             
-            #Get the point at the edge
-            srCalcPt = np.array([maxLim, rotM * maxLim + rotC])
+            #Store current LoA calculation in list
+            loaList.append(lineOfAction)
             
-        #If it is in the transverse plane, we'll use the max or min x-limit
-        #This depends on the limb used
-        if 'TP' in currPlaneName:
-            if '_r' in specimen:
-                #Get the point at the edge
-                srCalcPt = np.array([maxLim*-1, rotM * (maxLim*-1) + rotC])
-            elif '_l' in specimen:
+            #Calculate stability ratio
+            
+            #Set a point at the end of the line of action
+            #If this is in the scapular plane, we'll use the max x-limit
+            if 'SP' in currPlaneName:
+                
                 #Get the point at the edge
                 srCalcPt = np.array([maxLim, rotM * maxLim + rotC])
-
-        #Calculate the directional cosines for the axes
-        #This notes that the vector starts at the axes origin
-        
-        #Calculate the length of the vector between the origin and end point
-        vecLen = np.sqrt(srCalcPt[0]**2 + srCalcPt[1]**2)
-        
-        #Calculate the directional cosines for the X and Y axes
-        cosX = srCalcPt[0] / vecLen
-        cosY = srCalcPt[1] / vecLen
-        
-        #Calculate stability ratio
-        stabRatio = cosY / np.abs(cosX)
+                
+            #If it is in the transverse plane, we'll use the max or min x-limit
+            #This depends on the limb used
+            if 'TP' in currPlaneName:
+                if '_r' in specimen:
+                    #Get the point at the edge
+                    srCalcPt = np.array([maxLim*-1, rotM * (maxLim*-1) + rotC])
+                elif '_l' in specimen:
+                    #Get the point at the edge
+                    srCalcPt = np.array([maxLim, rotM * maxLim + rotC])
+    
+            #Calculate the directional cosines for the axes
+            #This notes that the vector starts at the axes origin
             
-        #Store current stability ratio calculation in list
-        srList.append(stabRatio)
-        
-        #Print stability ratio in bootom right corner of axes
-        lnAx.text(1-0.025, 0.1,
-                  'SR = '+str(np.round(stabRatio,3)),
-                  ha = 'right', va = 'center', transform = lnAx.transAxes)
+            #Calculate the length of the vector between the origin and end point
+            vecLen = np.sqrt(srCalcPt[0]**2 + srCalcPt[1]**2)
+            
+            #Calculate the directional cosines for the X and Y axes
+            cosX = srCalcPt[0] / vecLen
+            cosY = srCalcPt[1] / vecLen
+            
+            #Calculate stability ratio
+            stabRatio = cosY / np.abs(cosX)
+                
+            #Store current stability ratio calculation in list
+            srList.append(stabRatio)
+            
+            #Print stability ratio in bootom right corner of axes
+            lnAx.text(1-0.025, 0.1,
+                      'SR = '+str(np.round(stabRatio,3)),
+                      ha = 'right', va = 'center', transform = lnAx.transAxes)
+            
+        else:
+            
+            #Store current LoA calculation and stability ratio as nan
+            loaList.append(np.nan)
+            srList.append(np.nan)
         
     #Tight layout
     plt.tight_layout()
@@ -870,13 +894,13 @@ def calcLoA():
     
     #Convert line of action data to dataframe and export
     pd.DataFrame(list(zip(subscapNames, loaList)),
-                 columns = ['subscapLine', 'lineOfAction']).to_csv(
+                 columns = ['subscapLine', 'lineOfAction']).fillna('').to_csv(
                      'lineOfActionData.csv',
                      index = False)
                      
     #Convert stability ration to dataframe and export
     pd.DataFrame(list(zip(subscapNames, srList)),
-                 columns = ['subscapLine', 'stabilityRatio']).to_csv(
+                 columns = ['subscapLine', 'stabilityRatio']).fillna('').to_csv(
                      'stabilityRatioData.csv',
                      index = False)
 
@@ -1053,7 +1077,7 @@ for currDir in useDirList:
     
     #Search for the presence of digitised data
     #Will use the 'ss4.csv' file for this
-    if not glob('ss4.csv'):
+    if not glob('ss1.csv'):
         #Set to not analyse this folder
         analyseDir = False
     else:
@@ -1134,8 +1158,12 @@ for currDir in useDirList:
         #Get data
         for ss in range(len(subscapNames)):
             #Import .csv as dataframe and store to dataframe
-            subscapPoints[subscapNames[ss]] = pd.read_csv(subscapNames[ss]+'.csv')
-            
+            #Try to load as some lines could not be digitised
+            try:
+                subscapPoints[subscapNames[ss]] = pd.read_csv(subscapNames[ss]+'.csv')
+            except:
+                subscapPoints[subscapNames[ss]] = np.nan
+                
         #Humeral head points
         hhPoints = pd.read_csv('hh.csv')
                 
