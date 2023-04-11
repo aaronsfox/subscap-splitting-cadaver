@@ -44,7 +44,7 @@ from shutil import copy2, rmtree
 specimen = 'S9_l' #specimen number and label for limb tested
 
 #Latarjet condition to analyse
-latarjetCond = 'split25_lower' #split50, split25_upper, split25_lower
+latarjetCond = 'split25_upper' #split50, split25_upper, split25_lower
 
 #Set phantom type
 phantomType_SP = 'sphere' #sphere, toroid
