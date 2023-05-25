@@ -746,6 +746,20 @@ loaAgreementIntra = loaAgreement.loc[loaAgreement['condition'] != 'split50',]
 srAgreementInter = srAgreement.loc[srAgreement['condition'] == 'split50',]
 srAgreementIntra = srAgreement.loc[srAgreement['condition'] != 'split50',]
 
+#Save reliability results dataframes
+
+#Inter rater
+maAgreementInter.to_csv('..\\Results\\Reliability\\InterRater\\MomentArm_InterRater.csv', index = False)
+loaAgreementInter.to_csv('..\\Results\\Reliability\\InterRater\\LineOfAction_InterRater.csv', index = False)
+srAgreementInter.to_csv('..\\Results\\Reliability\\InterRater\\StabilityRatio_InterRater.csv', index = False)
+
+#Intra rater
+maAgreementIntra.to_csv('..\\Results\\Reliability\\IntraRater\\MomentArm_IntraRater.csv', index = False)
+loaAgreementIntra.to_csv('..\\Results\\Reliability\\IntraRater\\LineOfAction_IntraRater.csv', index = False)
+srAgreementIntra.to_csv('..\\Results\\Reliability\\IntraRater\\StabilityRatio_IntraRater.csv', index = False)
+
+# %% Plot and save 95% LoA
+
 #Plot and save 95% LoA's
 
 #Moment arms
