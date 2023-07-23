@@ -483,8 +483,9 @@ for subscap in subscapNames:
     #Create mean/SD point plot on relevant axis
     mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                             (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction', ci = 'sd',
-                       order = posNames, hue = 'load',
+                       x = 'position', y = 'lineOfAction', errorbar = 'sd',
+                       order = posNames, ### hue = 'load'
+                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
                        palette = greyPal, markers = 's',
                        join = False, dodge = 0.5,
                        ax = ax[subscapNames.index(subscap),0])
@@ -521,7 +522,8 @@ for subscap in subscapNames:
     sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                           (groupData['region'] == subscap)],
                        x = 'position', y = 'lineOfAction',
-                       order = posNames, hue = 'load',
+                       order = posNames, ###hue = 'load',
+                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
                        palette = greyPal, 
                        edgecolor = 'black', #facecolor = 'white',
                        size = 3, linewidth = 1,
@@ -596,10 +598,11 @@ for subscap in subscapNames:
     #Create mean/SD point plot on relevant axis
     mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
                                             (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction', ci = 'sd',
-                       order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
-                       join = False, dodge = 0.5, zorder = 3,
+                       x = 'position', y = 'lineOfAction', errorbar = 'sd',
+                       order = posNames,  ### hue = 'load'
+                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                       palette = greyPal, markers = 's',
+                       join = False, dodge = 0.5,
                        ax = ax[subscapNames.index(subscap),1])
     
     # #Create boxplot on relevant axis
@@ -634,7 +637,8 @@ for subscap in subscapNames:
     sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
                                           (groupData['region'] == subscap)],
                        x = 'position', y = 'lineOfAction',
-                       order = posNames, hue = 'load',
+                       order = posNames,  ### hue = 'load'
+                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
                        palette = greyPal, 
                        edgecolor = 'black', #facecolor = 'white',
                        size = 3, linewidth = 1,
@@ -715,7 +719,8 @@ for subscap in subscapNames:
 plt.tight_layout()
 
 #Save figure
-fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.png', dpi = 300, format = 'png')
+# fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\loa_Fig_allConditions_noStabilityRatio.png', dpi = 300, format = 'png')
 
 #Close figure
 plt.close()
@@ -742,7 +747,7 @@ for subscap in subscapNames:
                                             (groupData['region'] == subscap)],
                        x = 'position', y = 'momentArm', ci = 'sd',
                        order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
+                       palette = greyPal, markers = 's', size = 1,
                        join = False, dodge = 0.5, zorder = 3,
                        ax = ax[subscapNames.index(subscap),0])
     
@@ -805,7 +810,7 @@ for subscap in subscapNames:
                                             (groupData['region'] == subscap)],
                        x = 'position', y = 'momentArm', ci = 'sd',
                        order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
+                       palette = greyPal, markers = 's',
                        join = False, dodge = 0.5, zorder = 3,
                        ax = ax[subscapNames.index(subscap),1])
     
