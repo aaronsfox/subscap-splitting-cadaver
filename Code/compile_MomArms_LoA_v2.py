@@ -459,9 +459,9 @@ fitRes_TP = yFit - cubic(xFit, *pars_TP)
 
 """
 
-TODO:
-    > The below figures are only for a single condition comparison, would need to
-      update if wanting to display all conditions
+NOTE:
+    > There is adaptability in the below figures related to plotting by condition or load
+    > There is also adaptability to include point vs. box plots
 
 """
 
@@ -480,55 +480,59 @@ fig, ax = plt.subplots(nrows = 4, ncols = 2,
 #Loop through regions for scapula plane
 for subscap in subscapNames:
     
-    #Create mean/SD point plot on relevant axis
-    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
-                                            (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction', errorbar = 'sd',
-                       order = posNames, ### hue = 'load'
-                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                       palette = greyPal, markers = 's',
-                       join = False, dodge = 0.5,
-                       ax = ax[subscapNames.index(subscap),0])
+    # #Create mean/SD point plot on relevant axis
+    # mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #                                         (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'lineOfAction', errorbar = 'sd',
+    #                    order = posNames, ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, markers = 's',
+    #                    join = False, dodge = 0.5,
+    #                    ax = ax[subscapNames.index(subscap),0])
     
-    # #Create boxplot on relevant axis
-    # #Line of action data
-    # bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
-    #                                       (groupData['region'] == subscap)],
-    #                  x = 'position', y = 'lineOfAction',
-    #                  order = posNames, hue = 'load',
-    #                  palette = 'Greys', width = 0.3, whis = [0,100],
-    #                  ax = ax[subscapNames.index(subscap),0])
-    
-    # #Adjust colours of boxplot lines and fill
-    # for ii in range(len(bx.artists)):
-        
-    #     #Get the current artist
-    #     artist = bx.artists[ii]
-        
-    #     #Set the linecolor on the artist to the facecolor, and set the facecolor to None
-    #     col = artist.get_facecolor()
-    #     artist.set_edgecolor(col)
-    #     artist.set_facecolor('None')
-    
-    #     #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
-    #     #Loop over them here, and use the same colour as above
-    #     for jj in range(ii*6,ii*6+6):
-    #         line = ax[subscapNames.index(subscap),0].lines[jj]
-    #         line.set_color(col)
-    #         line.set_mfc(col)
-    #         line.set_mec(col)
-    
-    #Add point plot
-    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #Create boxplot on relevant axis
+    #Line of action data
+    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                           (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction',
-                       order = posNames, ###hue = 'load',
-                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                       palette = greyPal, 
-                       edgecolor = 'black', #facecolor = 'white',
-                       size = 3, linewidth = 1,
-                       dodge = 0.5, alpha = 1, zorder = 4,
-                       ax = ax[subscapNames.index(subscap),0])
+                     x = 'position', y = 'lineOfAction',
+                     order = posNames, ###hue = 'load',
+                     hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     ax = ax[subscapNames.index(subscap),0])
+    
+    #Adjust colours of boxplot lines and fill
+    for ii in range(1,len(ax[subscapNames.index(subscap),0].patches)):
+        
+        #Get the current artist
+        artist = ax[subscapNames.index(subscap),0].patches[ii]
+        
+        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+    
+    #Set lines in boxplot
+    lineCols = sns.color_palette(palette = 'Greys', n_colors = 3) * 5 
+    for ii in range(12):
+        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        #Loop over them here, and use the same colour as above
+        for jj in range(ii*6,ii*6+6):
+            line = ax[subscapNames.index(subscap),0].lines[jj]
+            line.set_color(lineCols[ii])
+            line.set_mfc(lineCols[ii])
+            line.set_mec(lineCols[ii])
+    
+    # #Add point plot
+    # sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #                                       (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'lineOfAction',
+    #                    order = posNames, ###hue = 'load',
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, 
+    #                    edgecolor = 'black', #facecolor = 'white',
+    #                    size = 3, linewidth = 1,
+    #                    dodge = 0.5, alpha = 1, zorder = 4,
+    #                    ax = ax[subscapNames.index(subscap),0])
     
     #Remove x-axis label
     ax[subscapNames.index(subscap),0].set_xlabel('')
@@ -595,55 +599,59 @@ for subscap in subscapNames:
 #Loop through regions for transverse plane
 for subscap in subscapNames:
     
-    #Create mean/SD point plot on relevant axis
-    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
-                                            (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction', errorbar = 'sd',
-                       order = posNames,  ### hue = 'load'
-                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                       palette = greyPal, markers = 's',
-                       join = False, dodge = 0.5,
-                       ax = ax[subscapNames.index(subscap),1])
+    # #Create mean/SD point plot on relevant axis
+    # mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #                                         (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'lineOfAction', errorbar = 'sd',
+    #                    order = posNames,  ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, markers = 's',
+    #                    join = False, dodge = 0.5,
+    #                    ax = ax[subscapNames.index(subscap),1])
     
-    # #Create boxplot on relevant axis
-    # #Line of action data
-    # bx2 = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'TP') &
-    #                                       (groupData['region'] == subscap)],
-    #                  x = 'position', y = 'lineOfAction',
-    #                  order = posNames, hue = 'load',
-    #                  palette = ['black', 'red'], width = 0.4, whis = [0,100],
-    #                  ax = ax[subscapNames.index(subscap),1])
-    
-    # #Adjust colours of boxplot lines and fill
-    # for ii in range(len(bx2.artists)):
-        
-    #     #Get the current artist
-    #     artist = bx2.artists[ii]
-        
-    #     #Set the linecolor on the artist to the facecolor, and set the facecolor to None
-    #     col = artist.get_facecolor()
-    #     artist.set_edgecolor(col)
-    #     artist.set_facecolor('None')
-    
-    #     #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
-    #     #Loop over them here, and use the same colour as above
-    #     for jj in range(ii*6,ii*6+6):
-    #         line = ax[subscapNames.index(subscap),1].lines[jj]
-    #         line.set_color(col)
-    #         line.set_mfc(col)
-    #         line.set_mec(col)
-    
-    #Add point plot
-    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #Create boxplot on relevant axis
+    #Line of action data
+    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'TP') &
                                           (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction',
-                       order = posNames,  ### hue = 'load'
-                       hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                       palette = greyPal, 
-                       edgecolor = 'black', #facecolor = 'white',
-                       size = 3, linewidth = 1,
-                       dodge = 0.5, alpha = 1, zorder = 4,
-                       ax = ax[subscapNames.index(subscap),1])
+                     x = 'position', y = 'lineOfAction',
+                     order = posNames, ###hue = 'load',
+                     hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     ax = ax[subscapNames.index(subscap),1])
+    
+    #Adjust colours of boxplot lines and fill
+    for ii in range(1,len(ax[subscapNames.index(subscap),1].patches)):
+        
+        #Get the current artist
+        artist = ax[subscapNames.index(subscap),1].patches[ii]
+        
+        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+    
+    #Set lines in boxplot
+    lineCols = sns.color_palette(palette = 'Greys', n_colors = 3) * 5 
+    for ii in range(12):
+        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        #Loop over them here, and use the same colour as above
+        for jj in range(ii*6,ii*6+6):
+            line = ax[subscapNames.index(subscap),1].lines[jj]
+            line.set_color(lineCols[ii])
+            line.set_mfc(lineCols[ii])
+            line.set_mec(lineCols[ii])
+    
+    # #Add point plot
+    # sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #                                       (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'lineOfAction',
+    #                    order = posNames,  ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, 
+    #                    edgecolor = 'black', #facecolor = 'white',
+    #                    size = 3, linewidth = 1,
+    #                    dodge = 0.5, alpha = 1, zorder = 4,
+    #                    ax = ax[subscapNames.index(subscap),1])
     
     #Remove x-axis label
     ax[subscapNames.index(subscap),1].set_xlabel('')
@@ -720,7 +728,10 @@ plt.tight_layout()
 
 #Save figure
 # fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.png', dpi = 300, format = 'png')
-fig.savefig('..\\Results\\Figures\\loa_Fig_allConditions_noStabilityRatio.png', dpi = 300, format = 'png')
+# fig.savefig('..\\Results\\Figures\\loa_Fig_allConditions_noStabilityRatio.png', dpi = 300, format = 'png')
+# fig.savefig('..\\Results\\Figures\\loa_Fig_allConditions_noStabilityRatio.pdf', dpi = 300, format = 'pdf')
+fig.savefig('..\\Results\\Figures\\loa_boxFig_allConditions_noStabilityRatio.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\loa_boxFig_allConditions_noStabilityRatio.pdf', dpi = 300, format = 'pdf')
 
 #Close figure
 plt.close()
@@ -742,25 +753,59 @@ fig, ax = plt.subplots(nrows = 4, ncols = 2,
 #Loop through regions for scapula plane
 for subscap in subscapNames:
     
-    #Create mean/SD point plot on relevant axis
-    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
-                                            (groupData['region'] == subscap)],
-                       x = 'position', y = 'momentArm', ci = 'sd',
-                       order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', size = 1,
-                       join = False, dodge = 0.5, zorder = 3,
-                       ax = ax[subscapNames.index(subscap),0])
+    # #Create mean/SD point plot on relevant axis
+    # mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #                                         (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'momentArm', errorbar = 'sd',
+    #                    order = posNames, ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, markers = 's',
+    #                    join = False, dodge = 0.5,
+    #                    ax = ax[subscapNames.index(subscap),0])
     
-    #Add point plot
-    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #Create boxplot on relevant axis
+    #Line of action data
+    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                           (groupData['region'] == subscap)],
-                       x = 'position', y = 'momentArm',
-                       order = posNames, hue = 'load',
-                       palette = greyPal, 
-                       edgecolor = 'black', #facecolor = 'white',
-                       size = 3, linewidth = 1,
-                       dodge = 0.5, alpha = 1, zorder = 4,
-                       ax = ax[subscapNames.index(subscap),0])
+                     x = 'position', y = 'momentArm',
+                     order = posNames, ###hue = 'load',
+                     hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     ax = ax[subscapNames.index(subscap),0])
+    
+    #Adjust colours of boxplot lines and fill
+    for ii in range(1,len(ax[subscapNames.index(subscap),0].patches)):
+        
+        #Get the current artist
+        artist = ax[subscapNames.index(subscap),0].patches[ii]
+        
+        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+    
+    #Set lines in boxplot
+    lineCols = sns.color_palette(palette = 'Greys', n_colors = 3) * 5 
+    for ii in range(12):
+        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        #Loop over them here, and use the same colour as above
+        for jj in range(ii*6,ii*6+6):
+            line = ax[subscapNames.index(subscap),0].lines[jj]
+            line.set_color(lineCols[ii])
+            line.set_mfc(lineCols[ii])
+            line.set_mec(lineCols[ii])
+    
+    # #Add point plot
+    # sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+    #                                         (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'momentArm',
+    #                    order = posNames,  ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, 
+    #                    edgecolor = 'black', #facecolor = 'white',
+    #                    size = 3, linewidth = 1,
+    #                    dodge = 0.5, alpha = 1, zorder = 4,
+    #                    ax = ax[subscapNames.index(subscap),0])
     
     #Remove x-axis label
     ax[subscapNames.index(subscap),0].set_xlabel('')
@@ -805,25 +850,59 @@ for subscap in subscapNames:
 #Loop through regions for transverse plane
 for subscap in subscapNames:
     
-    #Create mean/SD point plot on relevant axis
-    mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
-                                            (groupData['region'] == subscap)],
-                       x = 'position', y = 'momentArm', ci = 'sd',
-                       order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's',
-                       join = False, dodge = 0.5, zorder = 3,
-                       ax = ax[subscapNames.index(subscap),1])
+    # #Create mean/SD point plot on relevant axis
+    # mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #                                         (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'momentArm', errorbar = 'sd',
+    #                    order = posNames, ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, markers = 's',
+    #                    join = False, dodge = 0.5,
+    #                    ax = ax[subscapNames.index(subscap),1])
     
-    #Add point plot
-    sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #Create boxplot on relevant axis
+    #Line of action data
+    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'TP') &
                                           (groupData['region'] == subscap)],
-                       x = 'position', y = 'momentArm',
-                       order = posNames, hue = 'load',
-                       palette = greyPal, 
-                       edgecolor = 'black', #facecolor = 'white',
-                       size = 3, linewidth = 1,
-                       dodge = 0.5, alpha = 1, zorder = 4,
-                       ax = ax[subscapNames.index(subscap),1])
+                     x = 'position', y = 'momentArm',
+                     order = posNames, ###hue = 'load',
+                     hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     ax = ax[subscapNames.index(subscap),1])
+    
+    #Adjust colours of boxplot lines and fill
+    for ii in range(1,len(ax[subscapNames.index(subscap),1].patches)):
+        
+        #Get the current artist
+        artist = ax[subscapNames.index(subscap),1].patches[ii]
+        
+        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+    
+    #Set lines in boxplot
+    lineCols = sns.color_palette(palette = 'Greys', n_colors = 3) * 5 
+    for ii in range(12):
+        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        #Loop over them here, and use the same colour as above
+        for jj in range(ii*6,ii*6+6):
+            line = ax[subscapNames.index(subscap),1].lines[jj]
+            line.set_color(lineCols[ii])
+            line.set_mfc(lineCols[ii])
+            line.set_mec(lineCols[ii])
+    
+    # #Add point plot
+    # sp = sns.stripplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+    #                                         (groupData['region'] == subscap)],
+    #                    x = 'position', y = 'momentArm',
+    #                    order = posNames,  ### hue = 'load'
+    #                    hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+    #                    palette = greyPal, 
+    #                    edgecolor = 'black', #facecolor = 'white',
+    #                    size = 3, linewidth = 1,
+    #                    dodge = 0.5, alpha = 1, zorder = 4,
+    #                    ax = ax[subscapNames.index(subscap),1])
     
     #Remove x-axis label
     ax[subscapNames.index(subscap),1].set_xlabel('')
@@ -866,7 +945,11 @@ for subscap in subscapNames:
 plt.tight_layout()
 
 #Save figure
-fig.savefig('..\\Results\\Figures\\ma_Fig.png', dpi = 300, format = 'png')
+# fig.savefig('..\\Results\\Figures\\ma_Fig.png', dpi = 300, format = 'png')
+# fig.savefig('..\\Results\\Figures\\ma_Fig_allConditions.png', dpi = 300, format = 'png')
+# fig.savefig('..\\Results\\Figures\\ma_Fig_allConditions.pdf', dpi = 300, format = 'pdf')
+fig.savefig('..\\Results\\Figures\\ma_boxFig_allConditions.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\ma_boxFig_allConditions.pdf', dpi = 300, format = 'pdf')
 
 #Close figure
 plt.close()
