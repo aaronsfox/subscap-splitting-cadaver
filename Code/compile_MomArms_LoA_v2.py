@@ -20,6 +20,7 @@ Created on Mon Aug  2 15:14:21 2021
 # %% Import packages
 
 from matplotlib import pyplot as plt
+from matplotlib.patches import PathPatch
 import seaborn as sns
 import os
 from glob import glob
@@ -198,6 +199,40 @@ def procrustes(X, Y, scaling = False, reflection = 'best'):
    
     return d, Z, tform
 
+#Function for adjusting box widths on axes
+def adjust_box_widths(g, fac):
+    """
+    Adjust the widths of a seaborn-generated boxplot.
+    """
+
+    # iterating through Axes instances
+    for ax in g.axes:
+
+        # iterating through axes artists:
+        for c in ax.get_children():
+
+            # searching for PathPatches
+            if isinstance(c, PathPatch):
+                # getting current width of box:
+                p = c.get_path()
+                verts = p.vertices
+                verts_sub = verts[:-1]
+                xmin = np.min(verts_sub[:, 0])
+                xmax = np.max(verts_sub[:, 0])
+                xmid = 0.5*(xmin+xmax)
+                xhalf = 0.5*(xmax - xmin)
+
+                # setting new width of box
+                xmin_new = xmid-fac*xhalf
+                xmax_new = xmid+fac*xhalf
+                verts_sub[verts_sub[:, 0] == xmin, 0] = xmin_new
+                verts_sub[verts_sub[:, 0] == xmax, 0] = xmax_new
+
+                # setting new width of median line
+                for l in ax.lines:
+                    if np.all(l.get_xdata() == [xmin, xmax]):
+                        l.set_xdata([xmin_new, xmax_new])
+
 
 # %% Parameters to change
 
@@ -235,11 +270,11 @@ rcParams['font.sans-serif'] = 'Arial'
 rcParams['font.weight'] = 'bold'
 rcParams['axes.labelsize'] = 12
 rcParams['axes.titlesize'] = 16
-rcParams['axes.linewidth'] = 1.5
+rcParams['axes.linewidth'] = 1.0 #changed from 1.5
 rcParams['axes.labelweight'] = 'bold'
 rcParams['legend.fontsize'] = 10
-rcParams['xtick.major.width'] = 1.5
-rcParams['ytick.major.width'] = 1.5
+rcParams['xtick.major.width'] = 1.0 #changed from 1.5
+rcParams['ytick.major.width'] = 1.0 #changed from 1.5
 rcParams['legend.framealpha'] = 0.0
 rcParams['savefig.dpi'] = 300
 rcParams['savefig.format'] = 'pdf'
@@ -497,7 +532,8 @@ for subscap in subscapNames:
                      x = 'position', y = 'lineOfAction',
                      order = posNames, ###hue = 'load',
                      hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     palette = 'Greys', width = 0.3, #whis = [0,100],
+                     fliersize = 2,
                      ax = ax[subscapNames.index(subscap),0])
     
     #Adjust colours of boxplot lines and fill
@@ -616,7 +652,8 @@ for subscap in subscapNames:
                      x = 'position', y = 'lineOfAction',
                      order = posNames, ###hue = 'load',
                      hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     palette = 'Greys',  width = 0.3, #whis = [0,100],
+                     fliersize = 2,
                      ax = ax[subscapNames.index(subscap),1])
     
     #Adjust colours of boxplot lines and fill
@@ -723,8 +760,16 @@ for subscap in subscapNames:
     
     ### TODO: add images and labels on axes...
     
+#Adjust box widths on axes
+adjust_box_widths(fig, 0.65)
+    
 #Tight layout
 plt.tight_layout()
+
+#Turn off top-right spines on axes
+for figAxes in fig.axes:
+    figAxes.spines['top'].set_visible(False)
+    figAxes.spines['right'].set_visible(False)
 
 #Save figure
 # fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.png', dpi = 300, format = 'png')
@@ -770,7 +815,8 @@ for subscap in subscapNames:
                      x = 'position', y = 'momentArm',
                      order = posNames, ###hue = 'load',
                      hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     palette = 'Greys',  width = 0.3, #whis = [0,100],
+                     fliersize = 2,
                      ax = ax[subscapNames.index(subscap),0])
     
     #Adjust colours of boxplot lines and fill
@@ -867,7 +913,8 @@ for subscap in subscapNames:
                      x = 'position', y = 'momentArm',
                      order = posNames, ###hue = 'load',
                      hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
-                     palette = 'Greys', width = 0.3, whis = [0,100],
+                     palette = 'Greys',  width = 0.3, #whis = [0,100],
+                     fliersize = 2,
                      ax = ax[subscapNames.index(subscap),1])
     
     #Adjust colours of boxplot lines and fill
@@ -941,8 +988,16 @@ for subscap in subscapNames:
     ax[subscapNames.index(subscap),1].set_ylim([maMin_TP - (maMax_TP*0.1),
                                                 maMax_TP + (maMax_TP*0.1)])
     
+#Adjust box widths on axes
+adjust_box_widths(fig, 0.65)
+    
 #Tight layout
 plt.tight_layout()
+
+#Turn off top-right spines on axes
+for figAxes in fig.axes:
+    figAxes.spines['top'].set_visible(False)
+    figAxes.spines['right'].set_visible(False)
 
 #Save figure
 # fig.savefig('..\\Results\\Figures\\ma_Fig.png', dpi = 300, format = 'png')
