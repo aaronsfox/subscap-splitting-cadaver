@@ -1206,8 +1206,96 @@ fig.savefig('..\\Results\\Figures\\methods_Fig.png', dpi = 300, format = 'png')
 #Close figure
 plt.close()
 
-# %% OLD TEST CODE BELOW...
+# %% Visualise four separate lines on radiograph
 
+#Uses S4 90 abduction, 0N, scapular plane image
 
+#Create figure
+fig, ax = plt.subplots(figsize = (7,6), nrows = 1, ncols = 1)
 
+#Load image
+img = io.imread('S4_l\\split50\\abd90_0N_SP_D0302_T1332\\abd90_0N_SP_D0302_T1332_1_proc.tif')
+
+#Turn off axes and display image
+ax.axis('off')
+ax.imshow(img, cmap = 'gray', origin = 'upper', vmin = 0, vmax = 255)
+
+#Set tight layout
+plt.tight_layout()
+
+#Glenoid plane points
+#Need to calculate via reference points
+#Estimate glenoid plane based on image transformation
+
+#Import the digitised reference points from the current image
+transPts = pd.read_csv('S4_l\\split50\\abd90_0N_SP_D0302_T1332\\pts.csv')
+transPts = np.transpose(np.array([transPts['X'].to_numpy(), transPts['Y'].to_numpy()]))
+
+#Get original digitised points and glenoid pts
+refPts = pd.read_csv('S4_l\\split50\\abd0_0N_SP_D0302_T1308\\pts.csv')
+refPts = np.transpose(np.array([refPts['X'].to_numpy(), refPts['Y'].to_numpy()]))
+
+#Calculate procrustes transformation between points
+resErr, newPts, tform = procrustes(refPts, transPts)
+
+#Get the original gp points
+gpPts = pd.read_csv('S4_l\\split50\\abd0_0N_SP_D0302_T1308\\gp.csv')
+gpPts = np.transpose(np.array([gpPts['X'].to_numpy(), gpPts['Y'].to_numpy()]))
+
+#Apply the transformation to the reference glenoid plane points
+#Transform reference glenoid points to new array
+gpPts_trans = np.zeros(gpPts.shape)
+for pp in range(gpPts.shape[0]):
+    gpPts_trans[pp] = tform['rotation'].dot(gpPts[pp]) - tform['translation']
+    
+#Convert to same format
+gpPts_x = gpPts_trans[:,0]
+gpPts_y = gpPts_trans[:,1]
+
+#Get the digitised points data for this reference image
+#Loop through subscap names
+for subscap in subscapNames:
+    
+    #Read in the points
+    ssPts = pd.read_csv(f'S4_l\\split50\\abd90_0N_SP_D0302_T1332\\{subscap}.csv')
+    ssPts_x = ssPts['X'].to_numpy()
+    ssPts_y = ssPts['Y'].to_numpy()
+    
+    #Display digitised points
+    #Subscap points
+    ax.scatter(ssPts_x, ssPts_y, s = 15, c = 'red', zorder = 5)
+
+    #Display fits to these points
+    #Fit line
+    m,c = np.polyfit(ssPts_x, ssPts_y, 1)
+    #Plot fitted line
+    ax.plot(ssPts_x, (m * ssPts_x + c), c = 'red', lw = 1.5, zorder = 5)
+
+    # #Display line of action calculation
+    # #Calculate intersection of subscap to glenoid plane
+    # glenoidM, glenoidC = np.polyfit(gpPts_x, gpPts_y, 1)
+    # #Extract two points on a line fit to the glenoid plane
+    # gx1 = 0
+    # gx2 = 100
+    # gy1 = glenoidM * gx1 + glenoidC #y-intercept; x = 0
+    # gy2 = glenoidM * gx2 + glenoidC #x = 100
+    # #Extract two points on the subscapularis linefit
+    # sx1 = 0
+    # sx2 = 100
+    # sy1 = m * sx1 + c #y-intercept; x = 0
+    # sy2 = m * sx2 + c #x = 100
+    # #Calculate line intersection
+    # intX, intY = lineIntersect(gx1, gy1, gx2, gy2, sx1, sy1, sx2, sy2)
+    # #Extend subscapularis line
+    # #Line
+    # ax.plot(np.array(((ax.get_xlim()[1] / 5), np.max(ssPts_x))),
+    #         m * np.array(((ax.get_xlim()[1] / 6), np.max(ssPts_x))) + c,
+    #         c = 'red', lw = 1.5, ls = '--', zorder = 5)
+    
+
+#Save figure
+fig.savefig('..\\Results\\Figures\\methods_Fig_2.png', dpi = 300, format = 'png')
+
+#Close figure
+plt.close()
 
