@@ -452,10 +452,10 @@ for subscap in subscapNames:
     #Create mean/SD point plot on relevant axis
     mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                             (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction', ci = 'sd',
+                       x = 'position', y = 'lineOfAction', errorbar = 'sd',
                        order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
-                       join = False, dodge = 0.5, zorder = 3,
+                       palette = greyPal, markers = 's', #size = 1,
+                       join = False, dodge = 0.5, #zorder = 3,
                        ax = ax[subscapNames.index(subscap),0])
     
     # #Create boxplot on relevant axis
@@ -565,10 +565,10 @@ for subscap in subscapNames:
     #Create mean/SD point plot on relevant axis
     mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
                                             (groupData['region'] == subscap)],
-                       x = 'position', y = 'lineOfAction', ci = 'sd',
+                       x = 'position', y = 'lineOfAction', errorbar = 'sd',
                        order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
-                       join = False, dodge = 0.5, zorder = 3,
+                       palette = greyPal, markers = 's',# markersize = 1,
+                       join = False, dodge = 0.5, #zorder = 3,
                        ax = ax[subscapNames.index(subscap),1])
     
     # #Create boxplot on relevant axis
@@ -685,6 +685,7 @@ plt.tight_layout()
 
 #Save figure
 fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\loa_Fig_noStabilityRatio.eps', dpi = 600, format = 'eps')
 
 #Close figure
 plt.close()
@@ -709,10 +710,10 @@ for subscap in subscapNames:
     #Create mean/SD point plot on relevant axis
     mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'SP') &
                                             (groupData['region'] == subscap)],
-                       x = 'position', y = 'momentArm', ci = 'sd',
+                       x = 'position', y = 'momentArm', errorbar = 'sd',
                        order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
-                       join = False, dodge = 0.5, zorder = 3,
+                       palette = greyPal, markers = 's', #markersize = 1,
+                       join = False, dodge = 0.5, #zorder = 3,
                        ax = ax[subscapNames.index(subscap),0])
     
     #Add point plot
@@ -772,10 +773,10 @@ for subscap in subscapNames:
     #Create mean/SD point plot on relevant axis
     mn = sns.pointplot(data = groupData.loc[(groupData['plane'] == 'TP') &
                                             (groupData['region'] == subscap)],
-                       x = 'position', y = 'momentArm', ci = 'sd',
+                       x = 'position', y = 'momentArm', errorbar = 'sd',
                        order = posNames, hue = 'load',
-                       palette = greyPal, markers = 's', markersize = 1,
-                       join = False, dodge = 0.5, zorder = 3,
+                       palette = greyPal, markers = 's', #markersize = 1,
+                       join = False, dodge = 0.5, #zorder = 3,
                        ax = ax[subscapNames.index(subscap),1])
     
     #Add point plot
@@ -831,6 +832,7 @@ plt.tight_layout()
 
 #Save figure
 fig.savefig('..\\Results\\Figures\\ma_Fig.png', dpi = 300, format = 'png')
+fig.savefig('..\\Results\\Figures\\ma_Fig.eps', dpi = 600, format = 'eps')
 
 #Close figure
 plt.close()
