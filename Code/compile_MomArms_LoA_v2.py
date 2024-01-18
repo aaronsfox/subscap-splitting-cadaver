@@ -781,6 +781,193 @@ fig.savefig('..\\Results\\Figures\\loa_boxFig_allConditions_noStabilityRatio.pdf
 #Close figure
 plt.close()
 
+# %% Visualise data - LoA - group by task rather than region
+
+#Get max and min values in each plane to set y-axis limits
+#Scapular plane
+loaMax_SP = np.max(groupData.loc[groupData['plane'] == 'SP']['lineOfAction'])
+loaMin_SP = np.min(groupData.loc[groupData['plane'] == 'SP']['lineOfAction'])
+#Transverse plane
+loaMax_TP = np.max(groupData.loc[groupData['plane'] == 'TP']['lineOfAction'])
+loaMin_TP = np.min(groupData.loc[groupData['plane'] == 'TP']['lineOfAction'])
+
+#Create figure
+fig, ax = plt.subplots(nrows = 4, ncols = 2,
+                       figsize = (10,10))
+
+#Loop through regions for scapula plane
+for position in ['abd0', 'abd90', 'ABER', 'APP']:
+    
+    #Create boxplot on relevant axis
+    #Line of action data
+    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'SP') &
+                                          (groupData['position'] == position)],
+                     x = 'region', y = 'lineOfAction',
+                     order = subscapNames, ###hue = 'load',
+                     hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                     palette = 'Greys', width = 0.3, #whis = [0,100],
+                     fliersize = 2,
+                     ax = ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0])
+    
+    #Adjust colours of boxplot lines and fill
+    for ii in range(1,len(ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].patches)):
+        
+        #Get the current artist
+        artist = ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].patches[ii]
+        
+        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+    
+    #Set lines in boxplot
+    lineCols = sns.color_palette(palette = 'Greys', n_colors = 3) * 5 
+    for ii in range(12):
+        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        #Loop over them here, and use the same colour as above
+        for jj in range(ii*6,ii*6+6):
+            line = ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].lines[jj]
+            line.set_color(lineCols[ii])
+            line.set_mfc(lineCols[ii])
+            line.set_mec(lineCols[ii])
+    
+    #Remove x-axis label
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_xlabel('')
+    
+    #Set x-axes tick labels if bottom row
+    if ['abd0', 'abd90', 'ABER', 'APP'].index(position) == len(['abd0', 'abd90', 'ABER', 'APP'])-1:
+        #Set axis tick labels
+        ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_xticklabels(subscapLabels,
+                                                                               fontsize = 10,
+                                                                               fontweight = 'bold',
+                                                                               rotation = 45,
+                                                                               ha = 'right')
+    else:
+        #Remove tick labels
+        ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_xticklabels([])
+        
+    #Set title
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_title(posLabels[['abd0', 'abd90', 'ABER', 'APP'].index(position)],
+                                                                     fontsize = 12, fontweight = 'bold')
+    
+    #Set y-axis label
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_ylabel('Line of Action (\u00b0)\n(\u2190Inferior / Superior\u2192)',
+                                                                      fontsize = 10, fontweight = 'bold')
+    
+    #Add 'zero' line at 180 degrees
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].axhline(y = 180,
+                                                                   color = 'lightgrey',
+                                                                   linewidth = 1, linestyle = '--',
+                                                                   zorder = 0)
+    
+    #Remove legend
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].get_legend().remove()
+    
+    #Set y-axis limit to max and minimum values in dataset for plane
+    #Add a buffer of 2.5%
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_ylim([loaMin_SP - (loaMax_SP*0.025),
+                                                                     loaMax_SP + (loaMax_SP*0.025)])
+    
+    #Set y-axis labels to act around 180
+    ##### TODO: sort this out better...
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),0].set_yticks(np.array([120, 150, 180, 210, 240]))
+
+#Loop through regions for scapula plane
+for position in ['abd0', 'abd90', 'ABER', 'APP']:
+    
+    #Create boxplot on relevant axis
+    #Line of action data
+    bx = sns.boxplot(data = groupData.loc[(groupData['plane'] == 'TP') &
+                                          (groupData['position'] == position)],
+                     x = 'region', y = 'lineOfAction',
+                     order = subscapNames, ###hue = 'load',
+                     hue = 'condition', hue_order = ['split25_lower', 'split50', 'split25_upper'],
+                     palette = 'Greys', width = 0.3, #whis = [0,100],
+                     fliersize = 2,
+                     ax = ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1])
+    
+    #Adjust colours of boxplot lines and fill
+    for ii in range(1,len(ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].patches)):
+        
+        #Get the current artist
+        artist = ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].patches[ii]
+        
+        #Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        artist.set_facecolor('None')
+    
+    #Set lines in boxplot
+    lineCols = sns.color_palette(palette = 'Greys', n_colors = 3) * 5 
+    for ii in range(12):
+        #Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        #Loop over them here, and use the same colour as above
+        for jj in range(ii*6,ii*6+6):
+            line = ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].lines[jj]
+            line.set_color(lineCols[ii])
+            line.set_mfc(lineCols[ii])
+            line.set_mec(lineCols[ii])
+    
+    #Remove x-axis label
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_xlabel('')
+    
+    #Set x-axes tick labels if bottom row
+    if ['abd0', 'abd90', 'ABER', 'APP'].index(position) == len(['abd0', 'abd90', 'ABER', 'APP'])-1:
+        #Set axis tick labels
+        ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_xticklabels(subscapLabels,
+                                                                               fontsize = 10,
+                                                                               fontweight = 'bold',
+                                                                               rotation = 45,
+                                                                               ha = 'right')
+    else:
+        #Remove tick labels
+        ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_xticklabels([])
+        
+    #Set title
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_title(posLabels[['abd0', 'abd90', 'ABER', 'APP'].index(position)],
+                                                                     fontsize = 12, fontweight = 'bold')
+    
+    #Set y-axis label
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_ylabel('Line of Action (\u00b0)\n(\u2190Anterior / Posterior\u2192)',
+                                                                      fontsize = 10, fontweight = 'bold')
+    
+    #Add 'zero' line at 180 degrees
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].axhline(y = 180,
+                                                                   color = 'lightgrey',
+                                                                   linewidth = 1, linestyle = '--',
+                                                                   zorder = 0)
+    
+    #Remove legend
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].get_legend().remove()
+    
+    #Set y-axis limit to max and minimum values in dataset for plane
+    #Add a buffer of 2.5%
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_ylim([loaMin_TP - (loaMax_TP*0.025),
+                                                                     loaMax_TP + (loaMax_TP*0.025)])
+    
+    #Set y-axis labels to act around 180
+    ##### TODO: sort this out better...
+    ax[['abd0', 'abd90', 'ABER', 'APP'].index(position),1].set_yticks(np.array([120, 150, 180, 210, 240]))
+    
+#Adjust box widths on axes
+adjust_box_widths(fig, 0.65)
+    
+#Tight layout
+plt.tight_layout()
+
+#Turn off top-right spines on axes
+for figAxes in fig.axes:
+    figAxes.spines['top'].set_visible(False)
+    figAxes.spines['right'].set_visible(False)
+
+#Save figure
+fig.savefig('..\\Results\\Figures\\loa_boxFig_allConditions_byPosition_noStabilityRatio.png', dpi = 600, format = 'png')
+fig.savefig('..\\Results\\Figures\\loa_boxFig_allConditions_byPosition_noStabilityRatio.pdf', dpi = 600, format = 'pdf')
+fig.savefig('..\\Results\\Figures\\loa_boxFig_allConditions_byPosition_noStabilityRatio.eps', dpi = 600, format = 'eps')
+
+#Close figure
+plt.close()
+
 # %% Visualise data - moment arms
 
 #Get max and min values in each plane to set y-axis limits
